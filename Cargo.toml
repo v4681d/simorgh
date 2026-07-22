@@ -17,11 +17,11 @@ repository = "https://github.com/simorgh-app/simorgh"
 authors = ["Simorgh contributors"]
 
 [workspace.dependencies]
-simorgh-core = { path = "crates/core" }
-simorgh-audio = { path = "crates/audio" }
-simorgh-engines-stt = { path = "crates/engines-stt" }
-simorgh-engines-mt = { path = "crates/engines-mt" }
-simorgh-engines-tts = { path = "crates/engines-tts" }
+simorgh-core = { path = "crates/core", version = "0.1.0" }
+simorgh-audio = { path = "crates/audio", version = "0.1.0" }
+simorgh-engines-stt = { path = "crates/engines-stt", version = "0.1.0" }
+simorgh-engines-mt = { path = "crates/engines-mt", version = "0.1.0" }
+simorgh-engines-tts = { path = "crates/engines-tts", version = "0.1.0" }
 
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "fs", "process", "io-util"] }
 serde = { version = "1", features = ["derive"] }

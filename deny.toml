@@ -11,15 +11,25 @@ allow = [
   "MPL-2.0",
   "Unlicense",
   "CDLA-Permissive-2.0",
+  "CC0-1.0",
 ]
 confidence-threshold = 0.9
+
+# SPDX expression (not a bare license id) → allow per-crate via exceptions.
+[[licenses.exceptions]]
+allow = ["Apache-2.0 WITH LLVM-exception"]
+name = "target-lexicon"
 
 [bans]
 multiple-versions = "warn"
 wildcards = "deny"
+allow-wildcard-paths = true
 
 [advisories]
 yanked = "deny"
+# gtk-rs GTK3 bindings (forced by tauri's webkit2gtk-4.1 backend) are flagged
+# unmaintained; not vulnerabilities. Real CVEs still fail.
+unmaintained = "none"
 
 [sources]
 unknown-registry = "deny"
