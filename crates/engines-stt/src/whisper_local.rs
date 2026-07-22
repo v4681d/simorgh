@@ -117,10 +117,14 @@ impl SttEngine for WhisperLocal {
                             params.set_no_timestamps(true);
                             params.set_single_segment(true);
                             state.full(params, &samples).map_err(|e| anyhow::anyhow!("{e}"))?;
-                            let n = state.full_n_segments().map_err(|e| anyhow::anyhow!("{e}"))?;
+                            let n = state.full_n_segments();
                             let mut text = String::new();
                             for i in 0..n {
-                                text.push_str(&state.full_get_segment_text(i).unwrap_or_default());
+                                if let Some(seg) = state.get_segment(i) {
+                                    if let Ok(s) = seg.to_str_lossy() {
+                                        text.push_str(&s);
+                                    }
+                                }
                             }
                             Ok::<String, anyhow::Error>(text.trim().to_string())
                         }).await.map_err(|e| Error::Other(e.into()))??;
