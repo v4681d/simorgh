@@ -31,6 +31,22 @@ pub fn create_overlay(app: &AppHandle) -> tauri::Result<()> {
     Ok(())
 }
 
+/// Ensure the overlay exists and is visible. Called when a pipeline starts.
+pub fn show_overlay(app: &AppHandle) -> tauri::Result<()> {
+    match app.get_webview_window(OVERLAY_LABEL) {
+        Some(w) => w.show(),
+        None => create_overlay(app),
+    }
+}
+
+/// Hide the overlay (kept around so re-show is instant). Called on pipeline stop.
+pub fn hide_overlay(app: &AppHandle) -> tauri::Result<()> {
+    if let Some(w) = app.get_webview_window(OVERLAY_LABEL) {
+        w.hide()?;
+    }
+    Ok(())
+}
+
 pub fn toggle_overlay(app: &AppHandle) -> tauri::Result<()> {
     if let Some(w) = app.get_webview_window(OVERLAY_LABEL) {
         if w.is_visible()? {

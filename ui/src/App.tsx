@@ -10,6 +10,7 @@ import History from "./screens/History"
 import Settings from "./screens/Settings"
 import Wizard from "./screens/Wizard"
 import { getConfig } from "./api"
+import { getCurrentWindow } from "@tauri-apps/api/window"
 
 const SCREENS = ["dashboard", "devices", "engines", "models", "history", "settings"] as const
 export type Screen = (typeof SCREENS)[number]
@@ -31,7 +32,9 @@ export default function App() {
   if (showWizard) return <Wizard onDone={() => setShowWizard(false)} />
 
   return (
-    <div className="flex h-screen">
+    <div className="flex flex-col h-screen">
+      <TitleBar />
+      <div className="flex flex-1 min-h-0">
       {/* Sidebar — dark-gradient mark per brand guide */}
       <nav className="w-52 shrink-0 border-e border-white/20 bg-surface flex flex-col">
         <div className="flex items-center gap-2 px-4 py-4">
@@ -65,6 +68,40 @@ export default function App() {
         {screen === "history" && <History />}
         {screen === "settings" && <Settings />}
       </main>
+      </div>
+    </div>
+  )
+}
+
+function TitleBar() {
+  const win = getCurrentWindow()
+  const btn =
+    "w-11 h-9 flex items-center justify-center text-secondary hover:bg-white/20 hover:text-white text-[14px]"
+  return (
+    <div
+      data-tauri-drag-region
+      className="flex items-center justify-between h-9 shrink-0 bg-surface border-b border-white/20 select-none"
+    >
+      <div data-tauri-drag-region className="flex items-center gap-2 px-3">
+        <img
+          src="/brand/simorgh-mark-dark.svg"
+          alt=""
+          className="w-4 h-4"
+          onError={(e) => (e.currentTarget.style.display = "none")}
+        />
+        <span className="text-[12px] font-semibold tracking-wide">Simorgh</span>
+      </div>
+      <div className="flex items-center">
+        <button className={btn} onClick={() => win.minimize()} aria-label="Minimize">–</button>
+        <button className={btn} onClick={() => win.toggleMaximize()} aria-label="Maximize">▢</button>
+        <button
+          className="w-11 h-9 flex items-center justify-center text-secondary hover:bg-red-600 hover:text-white text-[14px]"
+          onClick={() => win.close()}
+          aria-label="Close"
+        >
+          ✕
+        </button>
+      </div>
     </div>
   )
 }

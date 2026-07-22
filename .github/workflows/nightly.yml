@@ -26,7 +26,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libasound2-dev \
-            libayatana-appindicator3-dev librsvg2-dev libssl-dev patchelf
+            libayatana-appindicator3-dev librsvg2-dev libssl-dev patchelf cmake
       - run: npm ci --prefix ui
       - name: Build bundles
         uses: tauri-apps/tauri-action@v0
@@ -34,6 +34,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: crates/app
+          args: --features whisper
       - uses: actions/upload-artifact@v4
         with:
           name: simorgh-nightly-${{ matrix.os }}

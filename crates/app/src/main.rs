@@ -40,21 +40,73 @@ fn main() {
             commands::set_overlay_click_through
         ])
         .setup(|app| {
-            windows::create_overlay(app.handle())?;
+            // Overlay is created lazily when a pipeline starts (see windows::show_overlay).
             windows::register_hotkeys(app.handle())?;
+            setup_tray(app.handle())?;
             Ok(())
         })
         .on_window_event(|window, event| {
-            // Persist overlay position/size on move/resize.
-            if window.label() == windows::OVERLAY_LABEL {
-                if let tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_) = event {
-                    let state = window.app_handle().state::<AppState>();
-                    state.persist_overlay_bounds(window);
+            let app = window.app_handle();
+            match event {
+                // Closing the dashboard quits the whole app (tears down the overlay too).
+                tauri::WindowEvent::CloseRequested { .. } if window.label() == "main" => {
+                    app.exit(0);
                 }
+                // Persist overlay position/size on move/resize.
+                tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)
+                    if window.label() == windows::OVERLAY_LABEL =>
+                {
+                    app.state::<AppState>().persist_overlay_bounds(window);
+                }
+                _ => {}
             }
         })
         .run(tauri::generate_context!())
         .expect("error while running Simorgh");
+}
+
+fn setup_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
+    use tauri::menu::{Menu, MenuItem};
+    use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
+
+    let show = MenuItem::with_id(app, "show", "Show Simorgh", true, None::<&str>)?;
+    let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+    let menu = Menu::with_items(app, &[&show, &quit])?;
+    let icon = app
+        .default_window_icon()
+        .cloned()
+        .expect("default window icon");
+
+    TrayIconBuilder::with_id("main")
+        .icon(icon)
+        .tooltip("Simorgh")
+        .menu(&menu)
+        .on_menu_event(|app, event| match event.id.as_ref() {
+            "show" => {
+                if let Some(w) = app.get_webview_window("main") {
+                    let _ = w.show();
+                    let _ = w.set_focus();
+                }
+            }
+            "quit" => app.exit(0),
+            _ => {}
+        })
+        .on_tray_icon_event(|tray, event| {
+            if let TrayIconEvent::Click {
+                button: MouseButton::Left,
+                button_state: MouseButtonState::Up,
+                ..
+            } = event
+            {
+                let app = tray.app_handle();
+                if let Some(w) = app.get_webview_window("main") {
+                    let _ = w.show();
+                    let _ = w.set_focus();
+                }
+            }
+        })
+        .build(app)?;
+    Ok(())
 }
 
 fn init_logging() {

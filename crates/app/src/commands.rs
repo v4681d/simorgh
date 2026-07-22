@@ -129,12 +129,20 @@ pub async fn start_pipeline(
         PipelineKind::Subtitle => *state.subtitle_pipeline.lock().expect("lock") = Some(handle),
         PipelineKind::Voice => *state.voice_pipeline.lock().expect("lock") = Some(handle),
     }
+    // Overlay appears only while a pipeline is active.
+    let _ = crate::windows::show_overlay(&app);
     Ok(())
 }
 
 #[tauri::command]
-pub fn stop_pipeline(state: State<AppState>, kind: PipelineKind) -> CmdResult<()> {
+pub fn stop_pipeline(app: AppHandle, state: State<AppState>, kind: PipelineKind) -> CmdResult<()> {
     stop_pipeline_inner(&state, kind);
+    // Hide the overlay once both pipelines are idle.
+    let both_idle = state.subtitle_pipeline.lock().expect("lock").is_none()
+        && state.voice_pipeline.lock().expect("lock").is_none();
+    if both_idle {
+        let _ = crate::windows::hide_overlay(&app);
+    }
     Ok(())
 }
 

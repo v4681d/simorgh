@@ -21,9 +21,9 @@ const CATALOG: Record<StageKey, { local: { engine: string; models: string[] }; a
   translator_subtitle: {
     local: { engine: "openai-compat", models: ["llama.cpp / Ollama / LM Studio"] },
     apiEngines: [
-      { engine: "openai-compat", label: "OpenAI-compatible" },
       { engine: "deepl", label: "DeepL" },
       { engine: "google", label: "Google Translate" },
+      { engine: "openai-compat", label: "OpenAI-compatible (cloud)" },
     ],
   },
   tts: {
@@ -73,7 +73,13 @@ function EngineCard({ stage, title, choice, onChange }: {
 }) {
   const { t } = useTranslation()
   const cat = CATALOG[stage]
-  const mode = cat.apiEngines.some((a) => a.engine === choice.engine && choice.engine !== cat.local.engine) ? t("engines.api") : t("engines.local")
+  // A base_url pointing at localhost means the OpenAI-compatible engine is
+  // driving a LOCAL model (Ollama/llama.cpp); a remote URL means cloud API.
+  const isLocalUrl = (url?: string | null) =>
+    !url || url.includes("localhost") || url.includes("127.0.0.1")
+  const isApi = cat.apiEngines.some((a) => a.engine === choice.engine)
+    && (choice.engine !== cat.local.engine || !isLocalUrl(choice.base_url))
+  const mode = isApi ? t("engines.api") : t("engines.local")
   const [apiKey, setApiKeyLocal] = useState("")
 
   const setMode = (m: string) => {
