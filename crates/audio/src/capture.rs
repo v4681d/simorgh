@@ -66,10 +66,15 @@ pub struct CaptureGuard {
 }
 
 #[cfg(feature = "cpal-backend")]
-trait StreamHolder: Send {}
+trait StreamHolder {}
 #[cfg(feature = "cpal-backend")]
 impl StreamHolder for cpal::Stream {}
 #[cfg(feature = "cpal-backend")]
+// ponytail: cpal::Stream is !Send by design (must be driven on its creation
+// thread). We move CaptureGuard across the async runtime anyway — safe only if
+// the guard is never dropped on a thread other than the one that started
+// capture. Upgrade: park the stream on a dedicated std::thread and hold a
+// shutdown handle here instead.
 unsafe impl Send for CaptureGuard {}
 
 pub fn downmix(interleaved: &[f32], channels: usize) -> Vec<f32> {

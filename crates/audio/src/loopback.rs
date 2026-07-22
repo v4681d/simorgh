@@ -8,7 +8,7 @@
 //!   device) and guide the user through routing via the in-app wizard.
 
 use crate::capture::CaptureGuard;
-use crate::devices::{DeviceInfo, DeviceKind};
+use crate::devices::DeviceInfo;
 use simorgh_core::types::AudioFrame;
 use simorgh_core::{Error, Result};
 use tokio::sync::mpsc;

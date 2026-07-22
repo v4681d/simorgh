@@ -9,7 +9,7 @@
 
 use serde::Serialize;
 use simorgh_core::types::AudioFrame;
-use simorgh_core::{Error, Result};
+use simorgh_core::Result;
 use tokio::sync::mpsc;
 use tracing::info;
 
