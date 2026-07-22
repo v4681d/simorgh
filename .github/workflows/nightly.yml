@@ -10,7 +10,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-26.04
+            args: --features whisper --bundles appimage
+          - os: windows-latest
+            args: --features whisper
+          - os: macos-latest
+            args: --features whisper
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -36,7 +42,7 @@ jobs:
           MACOSX_DEPLOYMENT_TARGET: "10.15"
         with:
           projectPath: crates/app
-          args: --features whisper
+          args: ${{ matrix.args }}
       - uses: actions/upload-artifact@v4
         with:
           name: simorgh-nightly-${{ matrix.os }}

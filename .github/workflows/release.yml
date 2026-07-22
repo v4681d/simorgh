@@ -28,8 +28,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-22.04     # AppImage, deb, rpm
-            args: --features whisper
+          - os: ubuntu-26.04     # AppImage only — portable, bundles deps
+            args: --features whisper --bundles appimage
           - os: windows-latest    # MSI, NSIS
             args: --features whisper
           - os: macos-latest      # DMG (universal)
