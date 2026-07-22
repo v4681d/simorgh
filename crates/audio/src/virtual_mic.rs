@@ -10,6 +10,8 @@
 use serde::Serialize;
 use simorgh_core::types::AudioFrame;
 use simorgh_core::Result;
+#[cfg(target_os = "linux")]
+use simorgh_core::Error;
 use tokio::sync::mpsc;
 use tracing::info;
 

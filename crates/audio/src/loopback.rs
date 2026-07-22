@@ -9,6 +9,8 @@
 
 use crate::capture::CaptureGuard;
 use crate::devices::DeviceInfo;
+#[cfg(target_os = "windows")]
+use crate::devices::DeviceKind;
 use simorgh_core::types::AudioFrame;
 use simorgh_core::{Error, Result};
 use tokio::sync::mpsc;
