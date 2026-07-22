@@ -73,18 +73,24 @@ function EngineCard({ stage, title, choice, onChange }: {
 }) {
   const { t } = useTranslation()
   const cat = CATALOG[stage]
-  // A base_url pointing at localhost means the OpenAI-compatible engine is
-  // driving a LOCAL model (Ollama/llama.cpp); a remote URL means cloud API.
+  // Only an explicit localhost base_url counts as LOCAL (Ollama/llama.cpp).
+  // Empty/remote base_url = API, so the user can reach the key field.
   const isLocalUrl = (url?: string | null) =>
-    !url || url.includes("localhost") || url.includes("127.0.0.1")
+    !!url && (url.includes("localhost") || url.includes("127.0.0.1"))
   const isApi = cat.apiEngines.some((a) => a.engine === choice.engine)
     && (choice.engine !== cat.local.engine || !isLocalUrl(choice.base_url))
   const mode = isApi ? t("engines.api") : t("engines.local")
   const [apiKey, setApiKeyLocal] = useState("")
 
   const setMode = (m: string) => {
-    if (m === t("engines.local")) onChange({ ...choice, engine: cat.local.engine, model: cat.local.models[0] })
-    else onChange({ ...choice, engine: cat.apiEngines[0].engine, model: null })
+    if (m === t("engines.local")) {
+      // For the OpenAI-compatible local engine, pin base_url to localhost so
+      // it's recognized as LOCAL (Ollama/llama.cpp default port).
+      const base_url = cat.local.engine === "openai-compat" ? "http://localhost:11434/v1" : choice.base_url
+      onChange({ ...choice, engine: cat.local.engine, model: cat.local.models[0], base_url })
+    } else {
+      onChange({ ...choice, engine: cat.apiEngines[0].engine, model: null })
+    }
   }
 
   const streaming = cat.apiEngines.find((a) => a.engine === choice.engine)?.streaming

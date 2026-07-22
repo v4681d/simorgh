@@ -62,6 +62,55 @@ pub fn start_capture(device_id: &str, tx: mpsc::Sender<AudioFrame>) -> Result<Ca
     }
 }
 
+/// WASAPI loopback (Windows): capture a named OUTPUT device's render stream.
+/// cpal transparently opens an output device in loopback mode when you build
+/// an input stream on it (see cpal wasapi docs). Output devices are NOT in
+/// `input_devices()`, so we search `output_devices()` here.
+#[cfg(feature = "cpal-backend")]
+pub fn start_output_loopback(
+    device_id: &str,
+    tx: mpsc::Sender<AudioFrame>,
+) -> Result<CaptureGuard> {
+    use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
+    let host = cpal::default_host();
+    let device = host
+        .output_devices()
+        .map_err(|e| Error::Audio(e.to_string()))?
+        .find(|d| d.name().map(|n| n == device_id).unwrap_or(false))
+        .ok_or_else(|| Error::Audio(format!("loopback output device not found: {device_id}")))?;
+    let config = device
+        .default_output_config()
+        .map_err(|e| Error::Audio(e.to_string()))?;
+    let src_rate = config.sample_rate().0;
+    let channels = config.channels() as usize;
+    info!(
+        device = device_id,
+        src_rate, channels, "starting loopback capture"
+    );
+    let stream = device
+        .build_input_stream(
+            &config.into(),
+            move |data: &[f32], _| {
+                let mono = downmix(data, channels);
+                let resampled = resample_linear(&mono, src_rate, TARGET_RATE);
+                let frame = AudioFrame {
+                    samples: resampled,
+                    sample_rate: TARGET_RATE,
+                    captured_at: Instant::now(),
+                    self_generated: false,
+                };
+                let _ = tx.try_send(frame);
+            },
+            |e| tracing::error!(error = %e, "loopback stream error"),
+            None,
+        )
+        .map_err(|e| Error::Audio(e.to_string()))?;
+    stream.play().map_err(|e| Error::Audio(e.to_string()))?;
+    Ok(CaptureGuard {
+        _stream: Some(Box::new(stream)),
+    })
+}
+
 pub struct CaptureGuard {
     #[cfg(feature = "cpal-backend")]
     _stream: Option<Box<dyn StreamHolder>>,

@@ -61,9 +61,9 @@ pub fn start_loopback(device_id: &str, tx: mpsc::Sender<AudioFrame>) -> Result<C
 #[cfg(target_os = "windows")]
 fn start_wasapi_loopback(device_id: &str, tx: mpsc::Sender<AudioFrame>) -> Result<CaptureGuard> {
     // cpal maps WASAPI loopback by allowing input streams on output devices.
-    // The capture module handles format conversion; we only need to find the
-    // render device and open it as input.
-    crate::capture::start_capture(device_id, tx)
+    // start_output_loopback finds the render endpoint among output_devices()
+    // (it is NOT in input_devices()) and opens it for loopback capture.
+    crate::capture::start_output_loopback(device_id, tx)
 }
 
 /// True if a BlackHole (or compatible) virtual device is present.
