@@ -25,11 +25,23 @@ impl OpenAiCompatTranslator {
             .clone()
             .unwrap_or_else(|| "https://api.openai.com/v1".into());
         let is_local = base_url.contains("localhost") || base_url.contains("127.0.0.1");
+        // Local servers usually need no key; cloud providers MUST have one —
+        // surface a clear error instead of a confusing 401 later.
+        let api_key = if is_local {
+            crate::api_key(choice).ok()
+        } else {
+            Some(crate::api_key(choice).map_err(|_| Error::Engine {
+                engine: "openai-compat".into(),
+                message: "API key not found for this cloud provider".into(),
+                fix: Some(
+                    "Enter the API key in THIS card's API key field, then Save or Test".into(),
+                ),
+            })?)
+        };
         Ok(Self {
             client: crate::http_client(choice)?,
             model: choice.model.clone().unwrap_or_else(|| "gpt-4o-mini".into()),
-            // Local servers usually need no key — don't hard-fail.
-            api_key: crate::api_key(choice).ok(),
+            api_key,
             base_url,
             is_local,
         })
