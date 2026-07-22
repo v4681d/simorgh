@@ -16,6 +16,10 @@ pub struct AppState {
     pub config: Mutex<AppConfig>,
     pub subtitle_pipeline: Mutex<Option<PipelineHandle>>,
     pub voice_pipeline: Mutex<Option<PipelineHandle>>,
+    /// Capture guards must outlive start_pipeline — holding them here keeps the
+    /// cpal stream alive until the pipeline stops, else audio dies on return.
+    pub subtitle_capture: Mutex<Option<simorgh_audio::capture::CaptureGuard>>,
+    pub voice_capture: Mutex<Option<simorgh_audio::capture::CaptureGuard>>,
     pub gate: SelfAudioGate,
     pub latency: Arc<LatencyRecorder>,
     pub subtitle_meter: LevelMeter,
@@ -41,6 +45,8 @@ impl AppState {
             config: Mutex::new(config),
             subtitle_pipeline: Mutex::new(None),
             voice_pipeline: Mutex::new(None),
+            subtitle_capture: Mutex::new(None),
+            voice_capture: Mutex::new(None),
             gate: SelfAudioGate::default(),
             latency: Arc::new(LatencyRecorder::default()),
             subtitle_meter: LevelMeter::default(),

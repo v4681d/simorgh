@@ -37,7 +37,8 @@
     "apiKey": "کلید API",
     "proxy": "پروکسی (HTTP/SOCKS5)",
     "streaming": "جریانی",
-    "offline": "آفلاین"
+    "offline": "آفلاین",
+    "test": "آزمایش"
   },
   "models": {
     "title": "مدیریت مدل‌ها",

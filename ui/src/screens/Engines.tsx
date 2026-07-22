@@ -81,6 +81,7 @@ function EngineCard({ stage, title, choice, onChange }: {
     && (choice.engine !== cat.local.engine || !isLocalUrl(choice.base_url))
   const mode = isApi ? t("engines.api") : t("engines.local")
   const [apiKey, setApiKeyLocal] = useState("")
+  const [testResult, setTestResult] = useState<string | null>(null)
 
   const setMode = (m: string) => {
     if (m === t("engines.local")) {
@@ -124,6 +125,9 @@ function EngineCard({ stage, title, choice, onChange }: {
           <input placeholder={t("engines.baseUrl")} value={choice.base_url ?? ""}
                  onChange={(e) => onChange({ ...choice, base_url: e.target.value || null })}
                  className="bg-canvas border border-white/20 rounded px-3 py-2" />
+          <input placeholder={t("engines.model")} value={choice.model ?? ""}
+                 onChange={(e) => onChange({ ...choice, model: e.target.value || null })}
+                 className="bg-canvas border border-white/20 rounded px-3 py-2" />
           <div className="flex gap-2">
             <input placeholder={t("engines.apiKey")} type="password" value={apiKey}
                    onChange={(e) => setApiKeyLocal(e.target.value)}
@@ -136,6 +140,23 @@ function EngineCard({ stage, title, choice, onChange }: {
           <input placeholder={t("engines.proxy")} value={choice.proxy ?? ""}
                  onChange={(e) => onChange({ ...choice, proxy: e.target.value || null })}
                  className="bg-canvas border border-white/20 rounded px-3 py-2" />
+          <div className="flex items-center gap-3">
+            <button
+              className="px-3 rounded bg-raised hover:bg-white/20 text-[14px]"
+              onClick={async () => {
+                setTestResult("…")
+                try {
+                  const r = await api.testEngine(stage.replace("_subtitle", ""))
+                  setTestResult(r)
+                } catch (e) {
+                  setTestResult("✗ " + String(e))
+                }
+              }}
+            >
+              {t("engines.test")}
+            </button>
+            {testResult && <span className="text-[13px] text-secondary">{testResult}</span>}
+          </div>
         </div>
       )}
     </section>

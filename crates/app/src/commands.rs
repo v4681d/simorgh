@@ -75,7 +75,9 @@ pub async fn start_pipeline(
                 .clone()
                 .ok_or("Select a loopback device first")?;
             let meter = state.subtitle_meter.clone();
-            let _guard = start_metered_loopback(&device, audio_tx, meter)?;
+            let guard = start_metered_loopback(&device, audio_tx, meter)?;
+            // Keep the capture stream alive for the pipeline's lifetime.
+            *state.subtitle_capture.lock().expect("lock") = Some(guard);
             pipeline::start_subtitle_pipeline(deps, audio_rx, events_tx)
                 .await
                 .map_err(err_to_string)?
@@ -103,7 +105,9 @@ pub async fn start_pipeline(
                 .clone()
                 .ok_or("Select a microphone first")?;
             let meter = state.voice_meter.clone();
-            let _guard = start_metered_capture(&mic, audio_tx, meter)?;
+            let guard = start_metered_capture(&mic, audio_tx, meter)?;
+            // Keep the capture stream alive for the pipeline's lifetime.
+            *state.voice_capture.lock().expect("lock") = Some(guard);
             let (sink_tx, sink_rx) = mpsc::channel(64);
             let sink = cfg
                 .devices
@@ -147,13 +151,15 @@ pub fn stop_pipeline(app: AppHandle, state: State<AppState>, kind: PipelineKind)
 }
 
 fn stop_pipeline_inner(state: &State<AppState>, kind: PipelineKind) {
-    let slot = match kind {
-        PipelineKind::Subtitle => &state.subtitle_pipeline,
-        PipelineKind::Voice => &state.voice_pipeline,
+    let (slot, cap) = match kind {
+        PipelineKind::Subtitle => (&state.subtitle_pipeline, &state.subtitle_capture),
+        PipelineKind::Voice => (&state.voice_pipeline, &state.voice_capture),
     };
     if let Some(mut h) = slot.lock().expect("lock").take() {
         h.stop();
     }
+    // Drop the capture guard — tears down the cpal stream.
+    let _ = cap.lock().expect("lock").take();
 }
 
 #[tauri::command]
@@ -385,6 +391,40 @@ pub fn get_logs(tail: Option<usize>) -> CmdResult<String> {
         Ok(content)
     } else {
         Ok(lines[lines.len() - tail..].join("\n"))
+    }
+}
+
+/// Smoke-test the configured engine for a stage. MT translates "hello", TTS
+/// synthesizes "test"; STT is construct-only (a live test needs an audio
+/// stream). Returns a short status string or the error.
+#[tauri::command]
+pub async fn test_engine(state: State<'_, AppState>, stage: String) -> CmdResult<String> {
+    let cfg = state.config.lock().expect("config lock").effective();
+    let pair = cfg.engines.subtitle_pair.clone().unwrap_or(LangPair {
+        source: Lang::en(),
+        target: Lang::fa(),
+    });
+    match stage.as_str() {
+        "translator" => {
+            let t = simorgh_engines_mt::create(&cfg.engines.translator_subtitle)
+                .map_err(err_to_string)?;
+            let out = t.translate("hello", &pair).await.map_err(err_to_string)?;
+            Ok(format!("✓ {out}"))
+        }
+        "tts" => {
+            let t = simorgh_engines_tts::create(&cfg.engines.tts).map_err(err_to_string)?;
+            let (tx, _rx) = mpsc::channel::<simorgh_core::types::AudioFrame>(8);
+            t.synthesize("test", pair.target.clone(), tx)
+                .await
+                .map_err(err_to_string)?;
+            Ok("✓ TTS ok".into())
+        }
+        "stt" => {
+            let _ =
+                simorgh_engines_stt::create(&cfg.engines.stt_subtitle).map_err(err_to_string)?;
+            Ok("✓ STT configured (live test on start)".into())
+        }
+        other => Err(format!("unknown stage: {other}")),
     }
 }
 

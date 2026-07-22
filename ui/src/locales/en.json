@@ -37,7 +37,8 @@
     "apiKey": "API key",
     "proxy": "Proxy (HTTP/SOCKS5)",
     "streaming": "streaming",
-    "offline": "offline"
+    "offline": "offline",
+    "test": "Test"
   },
   "models": {
     "title": "Model manager",

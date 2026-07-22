@@ -84,6 +84,8 @@ export const meterLevels = () => invoke<{ subtitle: { rms: number; peak: number 
 export const setApiKey = (entry: string, key: string) => invoke<void>("set_api_key", { entry, key })
 
 export const getLogs = (tail?: number) => invoke<string>("get_logs", { tail: tail ?? null })
+
+export const testEngine = (stage: string) => invoke<string>("test_engine", { stage })
 export const ensureVirtualMic = () => invoke<{ status: string; device?: string; instructions?: string }>("ensure_virtual_mic")
 export const listModels = () => invoke<{ name: string; kind: string; size_bytes: number | null; downloaded: boolean }[]>("list_models")
 export const downloadModel = (name: string, url: string, sha256?: string) => invoke<void>("download_model", { name, url, sha256 })

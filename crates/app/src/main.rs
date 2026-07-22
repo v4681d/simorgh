@@ -38,7 +38,8 @@ fn main() {
             commands::export_history,
             commands::toggle_overlay,
             commands::set_overlay_click_through,
-            commands::get_logs
+            commands::get_logs,
+            commands::test_engine
         ])
         .setup(|app| {
             // Overlay is created lazily when a pipeline starts (see windows::show_overlay).
