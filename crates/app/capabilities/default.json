@@ -1,0 +1,15 @@
+{
+  "identifier": "default",
+  "description": "Capabilities for the main dashboard + overlay windows.",
+  "windows": ["main", "overlay"],
+  "permissions": [
+    "core:default",
+    "core:window:allow-start-dragging",
+    "core:window:allow-set-ignore-cursor-events",
+    "core:window:allow-show",
+    "core:window:allow-hide",
+    "dialog:default",
+    "updater:default",
+    "global-shortcut:default"
+  ]
+}

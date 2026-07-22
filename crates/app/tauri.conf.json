@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Simorgh",
+  "version": "0.1.0",
+  "identifier": "com.simorgh.app",
+  "build": {
+    "beforeDevCommand": "npm --prefix ../ui run dev",
+    "beforeBuildCommand": "npm --prefix ../ui run build",
+    "devUrl": "http://localhost:5173",
+    "frontendDist": "../ui/dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Simorgh — سیمرغ",
+        "url": "index.html",
+        "width": 1100,
+        "height": 760,
+        "minWidth": 960,
+        "minHeight": 640,
+        "resizable": true,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["msi", "nsis"],
+    "icon": [
+      "icons/icon.ico",
+      "icons/icon.png",
+      "icons/32.png",
+      "icons/128.png",
+      "icons/256.png",
+      "icons/512.png"
+    ]
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/USER/simorgh/releases/latest/download/latest.json"
+      ],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdBREI0M0U2NzkzRjU4NjAKUldSZ1dEOTU1a1BiZW5qVm1Ia0dvT004bCtYcDFMOGJRaThCTkRlM04reTNreFVmUCtmanBIOHEK",
+      "dialog": true
+    }
+  }
+}
