@@ -277,7 +277,10 @@ pub async fn download_model(
     file.flush().await.map_err(|e| e.to_string())?;
     if let Some(expected) = sha256 {
         let bytes = tokio::fs::read(&tmp).await.map_err(|e| e.to_string())?;
-        let actual = hex::encode(sha2::Sha256::digest(&bytes));
+        let actual: String = sha2::Sha256::digest(&bytes)
+            .iter()
+            .map(|b| format!("{b:02x}"))
+            .collect();
         if actual != expected.to_lowercase() {
             let _ = tokio::fs::remove_file(&tmp).await;
             return Err("Checksum mismatch — download corrupted, please retry".into());

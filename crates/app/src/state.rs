@@ -9,6 +9,7 @@ use simorgh_core::types::{PipelineKind, TranslationUpdate};
 use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};
 
+#[allow(dead_code)] // history write not yet wired into the pipeline
 const HISTORY_CAP: usize = 2_000;
 
 pub struct AppState {
@@ -48,6 +49,7 @@ impl AppState {
         }
     }
 
+    #[allow(dead_code)] // history write not yet wired into the pipeline
     pub fn push_history(&self, kind: PipelineKind, u: &TranslationUpdate, at_ms: u64) {
         let mut h = self.history.lock().expect("history lock");
         if h.len() >= HISTORY_CAP {

@@ -49,6 +49,8 @@ pub fn start_capture(device_id: &str, tx: mpsc::Sender<AudioFrame>) -> Result<Ca
             )
             .map_err(|e| Error::Audio(e.to_string()))?;
         stream.play().map_err(|e| Error::Audio(e.to_string()))?;
+        // Short-circuits past the #[cfg(not)] fallback below — not needless.
+        #[allow(clippy::needless_return)]
         return Ok(CaptureGuard {
             _stream: Some(Box::new(stream)),
         });
