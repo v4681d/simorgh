@@ -37,7 +37,8 @@ fn main() {
             commands::delete_model,
             commands::export_history,
             commands::toggle_overlay,
-            commands::set_overlay_click_through
+            commands::set_overlay_click_through,
+            commands::get_logs
         ])
         .setup(|app| {
             // Overlay is created lazily when a pipeline starts (see windows::show_overlay).
@@ -125,7 +126,7 @@ fn init_logging() {
         .init();
 }
 
-fn log_dir() -> std::path::PathBuf {
+pub fn log_dir() -> std::path::PathBuf {
     directories::ProjectDirs::from("app", "simorgh", "simorgh")
         .map(|d| d.data_dir().join("logs"))
         .unwrap_or_else(|| "logs".into())

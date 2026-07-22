@@ -34,6 +34,9 @@ pub struct GeneralConfig {
     pub open_mic: bool,
     /// Telemetry is opt-in and off by default. No exceptions.
     pub telemetry: bool,
+    /// Developer mode: surfaces the Logs section + raw diagnostics in the UI.
+    #[serde(default)]
+    pub developer_mode: bool,
 }
 
 impl Default for GeneralConfig {
@@ -45,6 +48,7 @@ impl Default for GeneralConfig {
             push_to_talk_hotkey: "CmdOrCtrl+Space".into(),
             open_mic: false,
             telemetry: false,
+            developer_mode: false,
         }
     }
 }

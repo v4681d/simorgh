@@ -28,6 +28,7 @@ export interface AppConfig {
     push_to_talk_hotkey: string
     open_mic: boolean
     telemetry: boolean
+    developer_mode: boolean
   }
   devices: {
     loopback_device: string | null
@@ -81,6 +82,8 @@ export const pipelineStatus = () => invoke<{ subtitle: string; voice: string }>(
 export const latencyReport = () => invoke<{ per_stage_ms: Record<string, number>; end_to_end_ms: number }>("latency_report")
 export const meterLevels = () => invoke<{ subtitle: { rms: number; peak: number }; voice: { rms: number; peak: number } }>("meter_levels")
 export const setApiKey = (entry: string, key: string) => invoke<void>("set_api_key", { entry, key })
+
+export const getLogs = (tail?: number) => invoke<string>("get_logs", { tail: tail ?? null })
 export const ensureVirtualMic = () => invoke<{ status: string; device?: string; instructions?: string }>("ensure_virtual_mic")
 export const listModels = () => invoke<{ name: string; kind: string; size_bytes: number | null; downloaded: boolean }[]>("list_models")
 export const downloadModel = (name: string, url: string, sha256?: string) => invoke<void>("download_model", { name, url, sha256 })

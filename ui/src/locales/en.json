@@ -5,7 +5,8 @@
     "engines": "Engines",
     "models": "Models",
     "history": "History",
-    "settings": "Settings"
+    "settings": "Settings",
+    "logs": "Logs"
   },
   "dashboard": {
     "pipelineA": "Listen & subtitle",
@@ -59,7 +60,8 @@
     "maxChunk": "Max chunk window",
     "debounce": "Re-translation debounce",
     "openMic": "Open mic mode",
-    "hotkey": "Toggle pipelines hotkey"
+    "hotkey": "Toggle pipelines hotkey",
+    "developer": "Developer mode (show Logs)"
   },
   "wizard": {
     "welcome": "Welcome",
@@ -75,5 +77,13 @@
   },
   "overlay": {
     "dragHint": "Drag to move · scroll to resize"
+  },
+  "logs": {
+    "title": "Logs",
+    "autoRefresh": "Auto-refresh",
+    "refresh": "Refresh",
+    "copy": "Copy",
+    "empty": "No log output yet.",
+    "lines": "lines (tail)"
   }
 }

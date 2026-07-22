@@ -71,6 +71,12 @@ export default function Settings() {
                onChange={(e) => save({ ...cfg, general: { ...cfg.general, global_hotkey_toggle: e.target.value } })}
                className="bg-surface border border-white/20 rounded px-3 py-2" />
       </Field>
+
+      <Field label={t("settings.developer")}>
+        <input type="checkbox" checked={cfg.general.developer_mode}
+               onChange={(e) => save({ ...cfg, general: { ...cfg.general, developer_mode: e.target.checked } })}
+               className="w-5 h-5 accent-[#5E9FE8]" />
+      </Field>
     </div>
   )
 }

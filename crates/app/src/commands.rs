@@ -359,6 +359,35 @@ pub fn set_overlay_click_through(app: AppHandle, enabled: bool) -> CmdResult<()>
     windows::set_click_through(&app, enabled).map_err(|e| e.to_string())
 }
 
+/// Tail of the most recent log file (developer mode). Daily-rotated files
+/// keep the `simorgh.log` prefix, so we pick the newest match by mtime.
+#[tauri::command]
+pub fn get_logs(tail: Option<usize>) -> CmdResult<String> {
+    let dir = crate::log_dir();
+    let mut files: Vec<(std::path::PathBuf, std::time::SystemTime)> = std::fs::read_dir(&dir)
+        .into_iter()
+        .flatten()
+        .flatten()
+        .filter(|e| e.file_name().to_string_lossy().starts_with("simorgh.log"))
+        .filter_map(|e| {
+            let m = e.metadata().ok()?;
+            Some((e.path(), m.modified().unwrap_or(std::time::UNIX_EPOCH)))
+        })
+        .collect();
+    files.sort_by_key(|(_, t)| *t);
+    let content = files
+        .last()
+        .map(|(p, _)| std::fs::read_to_string(p).unwrap_or_default())
+        .unwrap_or_default();
+    let tail = tail.unwrap_or(800);
+    let lines: Vec<&str> = content.lines().collect();
+    if lines.len() <= tail {
+        Ok(content)
+    } else {
+        Ok(lines[lines.len() - tail..].join("\n"))
+    }
+}
+
 // ---- capture helpers with metering taps ----
 
 fn start_metered_loopback(

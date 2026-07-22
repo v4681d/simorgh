@@ -8,22 +8,26 @@ import Engines from "./screens/Engines"
 import Models from "./screens/Models"
 import History from "./screens/History"
 import Settings from "./screens/Settings"
+import Logs from "./screens/Logs"
 import Wizard from "./screens/Wizard"
 import { getConfig } from "./api"
 import { getCurrentWindow } from "@tauri-apps/api/window"
 
 const SCREENS = ["dashboard", "devices", "engines", "models", "history", "settings"] as const
 export type Screen = (typeof SCREENS)[number]
+type NavScreen = Screen | "logs"
 
 export default function App() {
   const { t, i18n } = useTranslation()
-  const [screen, setScreen] = useState<Screen>("dashboard")
+  const [screen, setScreen] = useState<NavScreen>("dashboard")
   const [showWizard, setShowWizard] = useState(false)
+  const [devMode, setDevMode] = useState(false)
 
   useEffect(() => {
     getConfig().then((cfg) => {
       // First run: no devices selected yet -> onboarding wizard (light theme).
       if (!cfg.devices.mic_device && !cfg.devices.loopback_device) setShowWizard(true)
+      setDevMode(cfg.general.developer_mode)
       i18n.changeLanguage(cfg.general.ui_language)
       applyDirection(cfg.general.ui_language)
     }).catch(() => {})
@@ -54,6 +58,16 @@ export default function App() {
               {t(`nav.${s}`)}
             </button>
           ))}
+          {devMode && (
+            <button
+              onClick={() => setScreen("logs")}
+              className={`text-start px-3 py-2 rounded text-[14px] ${
+                screen === "logs" ? "bg-raised text-white" : "text-secondary hover:bg-raised/60"
+              }`}
+            >
+              {t("nav.logs")}
+            </button>
+          )}
         </div>
         <div className="mt-auto px-4 py-3 flex items-center gap-2 text-secondary">
           <MarkMono size={16} />
@@ -67,6 +81,7 @@ export default function App() {
         {screen === "models" && <Models />}
         {screen === "history" && <History />}
         {screen === "settings" && <Settings />}
+        {screen === "logs" && devMode && <Logs />}
       </main>
       </div>
     </div>
