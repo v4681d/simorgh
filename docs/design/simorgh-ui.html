@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simorgh — UI/UX Concept</title>
+<style>
+  :root{
+    --canvas:#191919; --surface:#202020; --raised:#383836;
+    --text:#FFFFFF; --text2:rgba(255,255,255,.65); --text3:rgba(255,255,255,.45);
+    --border:rgba(255,255,255,.2); --border-soft:rgba(255,255,255,.12);
+    --blue:#5E9FE8; --green:#72BC8F; --orange:#DE9255; --red:#E97366;
+    --l-canvas:#FFFFFF; --l-soft:#F9F8F7; --l-surface:#F0EFED; --l-border:#E6E5E3;
+    --l-ink:#2C2C2B; --l-ink2:#7D7A75; --l-blue:#2783DE; --l-green:#46A171;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --fa:"Noto Sans Arabic","Vazirmatn",var(--sans);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--l-soft);color:var(--l-ink);line-height:1.5;padding:48px 24px}
+  .wrap{max-width:1200px;margin:0 auto}
+  .eyebrow{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.04em;color:var(--l-blue);background:#E8F1FB;border-radius:999px;padding:4px 12px;margin-bottom:16px}
+  h1{font-size:32px;letter-spacing:-.02em;margin-bottom:8px}
+  .sub{color:var(--l-ink2);max-width:640px;margin-bottom:40px}
+  h2.section{font-size:20px;letter-spacing:-.01em;margin:56px 0 6px}
+  p.section-sub{color:var(--l-ink2);font-size:14px;margin-bottom:16px;max-width:680px}
+
+  .window{border:1px solid var(--l-border);border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);background:var(--canvas)}
+  .titlebar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#161616;border-bottom:1px solid var(--border-soft)}
+  .dot{width:11px;height:11px;border-radius:50%}
+  .dot.r{background:#FF5F57}.dot.y{background:#FEBC2E}.dot.g{background:#28C840}
+  .tname{margin-left:8px;font-size:12px;color:var(--text3)}
+
+  /* ---------- Dashboard ---------- */
+  .app{display:flex;min-height:560px;color:var(--text)}
+  .side{width:200px;background:#1D1D1D;border-right:1px solid var(--border-soft);padding:16px 10px;flex-shrink:0}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;padding:4px 8px 16px}
+  .brand svg{width:26px;height:26px}
+  .nav{display:flex;flex-direction:column;gap:2px}
+  .nav a{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;font-size:13.5px;color:var(--text2);text-decoration:none}
+  .nav a.active{background:var(--raised);color:var(--text);font-weight:600}
+  .main{flex:1;padding:20px 24px;min-width:0}
+  .statusline{display:flex;align-items:center;gap:14px;font-size:12.5px;color:var(--text2);margin-bottom:18px;flex-wrap:wrap}
+  .pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:5px}
+  .card{background:var(--surface);border:1px solid var(--border-soft);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+  .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .card-title{font-size:14.5px;font-weight:600}
+  .toggle{width:38px;height:22px;border-radius:999px;background:var(--green);position:relative;flex-shrink:0}
+  .toggle::after{content:"";position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:#fff}
+  .toggle.off{background:var(--raised)}
+  .toggle.off::after{right:auto;left:2px}
+  .chips{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .chip{display:inline-flex;align-items:center;gap:6px;background:var(--raised);border:1px solid var(--border-soft);border-radius:999px;padding:4px 11px;font-size:12.5px;color:var(--text)}
+  .chip small{color:var(--text3);font-size:11px}
+  .arrow{color:var(--text3);font-size:13px}
+  .meterrow{display:flex;align-items:center;gap:12px}
+  .vu{display:flex;align-items:flex-end;gap:2px;height:26px}
+  .vu i{width:4px;background:linear-gradient(180deg,var(--green),#3d7a58);border-radius:2px;animation:vu 1s ease-in-out infinite}
+  @keyframes vu{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+  .vu i{transform-origin:bottom}
+  .badges{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+  .badge{font-size:11px;color:var(--text2);border:1px solid var(--border-soft);border-radius:6px;padding:2px 8px}
+  .badge.good{color:var(--green);border-color:rgba(114,188,143,.4)}
+  .transcript{background:var(--surface);border:1px solid var(--border-soft);border-radius:12px;overflow:hidden}
+  .transcript .thead{font-size:11px;letter-spacing:.05em;color:var(--text3);text-transform:uppercase;padding:10px 18px;border-bottom:1px solid var(--border-soft)}
+  .trow{display:grid;grid-template-columns:52px 1fr 1fr;gap:16px;padding:9px 18px;border-bottom:1px solid var(--border-soft);font-size:13px}
+  .trow:last-child{border-bottom:none}
+  .trow .ts{color:var(--text3);font-size:11.5px;padding-top:2px}
+  .trow .fa{font-family:var(--fa);direction:rtl;text-align:right}
+  .trow.partial{opacity:.55;font-style:italic}
+
+  /* ---------- Overlay ---------- */
+  .scene{position:relative;height:340px;background:linear-gradient(135deg,#2b3446 0%,#1c2231 55%,#151a26 100%);display:flex;align-items:flex-end;justify-content:center;padding-bottom:36px}
+  .scenehint{position:absolute;top:14px;left:16px;font-size:11.5px;color:rgba(255,255,255,.4)}
+  .overlay{width:640px;max-width:88%;background:rgba(12,12,14,.82);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:14px 22px 10px;color:#fff}
+  .ov-src{font-size:12.5px;color:rgba(255,255,255,.5);margin-bottom:5px}
+  .ov-dst{font-family:var(--fa);direction:rtl;text-align:right;font-size:20px;line-height:1.7}
+  .ov-dst .part{opacity:.5}
+  .ov-foot{display:flex;justify-content:space-between;font-size:10.5px;color:rgba(255,255,255,.35);margin-top:8px}
+
+  /* ---------- Wizard (light) ---------- */
+  .wizard{background:var(--l-canvas);color:var(--l-ink);padding:28px 36px;min-height:480px}
+  .steps{display:flex;align-items:center;gap:8px;margin-bottom:28px;flex-wrap:wrap}
+  .step{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--l-ink2)}
+  .stepnum{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11.5px;border:1.5px solid var(--l-border);background:var(--l-soft)}
+  .step.done .stepnum{background:var(--l-green);border-color:var(--l-green);color:#fff}
+  .step.cur{color:var(--l-ink);font-weight:600}
+  .step.cur .stepnum{background:var(--l-blue);border-color:var(--l-blue);color:#fff}
+  .stepbar{width:26px;height:1.5px;background:var(--l-border)}
+  .wizard h3{font-size:22px;letter-spacing:-.01em;margin-bottom:6px}
+  .wizard .wsub{color:var(--l-ink2);font-size:14px;margin-bottom:24px}
+  .field{margin-bottom:18px;max-width:520px}
+  .field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+  .select{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--l-border);background:var(--l-soft);border-radius:8px;padding:10px 14px;font-size:14px}
+  .select span.arr{color:var(--l-ink2);font-size:11px}
+  .lmeter{display:flex;align-items:center;gap:8px;margin-top:7px;font-size:12px;color:var(--l-green);font-weight:600}
+  .lbar{flex:0 0 180px;height:6px;border-radius:3px;background:var(--l-surface);overflow:hidden;position:relative}
+  .lbar i{position:absolute;inset:0;width:62%;background:linear-gradient(90deg,var(--l-blue),var(--l-green));border-radius:3px}
+  .wbtns{display:flex;gap:10px;margin-top:28px}
+  .btn{border-radius:8px;padding:9px 18px;font-size:14px;font-weight:600;border:1px solid var(--l-border);background:#fff;color:var(--l-ink)}
+  .btn.primary{background:var(--l-blue);border-color:var(--l-blue);color:#fff}
+
+  /* ---------- Engines ---------- */
+  .engines{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:22px;color:var(--text)}
+  .ecard{background:var(--surface);border:1px solid var(--border-soft);border-radius:12px;padding:16px}
+  .ecard .stage{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+  .seg{display:flex;background:var(--raised);border-radius:8px;padding:3px;margin-bottom:12px}
+  .seg span{flex:1;text-align:center;font-size:12.5px;padding:5px 0;border-radius:6px;color:var(--text2)}
+  .seg span.on{background:var(--blue);color:#fff;font-weight:600}
+  .eselect{display:flex;align-items:center;justify-content:space-between;background:var(--raised);border:1px solid var(--border-soft);border-radius:8px;padding:9px 12px;font-size:13px;margin-bottom:12px}
+  .ebadges{display:flex;gap:6px;flex-wrap:wrap}
+  .progress{margin-top:12px;font-size:11.5px;color:var(--text2)}
+  .pbar{height:5px;border-radius:3px;background:var(--raised);margin-top:5px;overflow:hidden}
+  .pbar i{display:block;height:100%;width:64%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:3px}
+
+  /* ---------- Principles ---------- */
+  .principles{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:16px}
+  .pcard{background:#fff;border:1px solid var(--l-border);border-radius:12px;padding:18px 20px}
+  .pcard h4{font-size:14.5px;margin-bottom:6px}
+  .pcard p{font-size:13.5px;color:var(--l-ink2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="eyebrow">UI/UX Concept</span>
+  <h1>Simorgh — design walkthrough</h1>
+  <p class="sub">Four key surfaces of the real-time speech translation app: the dashboard, the subtitle overlay, first-run onboarding, and the engine picker. Dark theme for the main app, light for the wizard.</p>
+
+  <h2 class="section">1 · Dashboard</h2>
+  <p class="section-sub">Both pipelines at a glance. The signal path is drawn as clickable chips, VU meters prove audio is flowing, and latency is reported per stage — never a bare “Running” label.</p>
+  <div class="window">
+    <div class="titlebar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="tname">Simorgh</span></div>
+    <div class="app">
+      <div class="side">
+        <div class="brand">
+          <svg viewBox="0 0 120 120"><defs><linearGradient id="bg1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5E9FE8"/><stop offset="1" stop-color="#72BC8F"/></linearGradient></defs><g fill="none" stroke="url(#bg1)" stroke-width="11" stroke-linecap="round"><path d="M10 64 q7 -16 14 0 t14 0 t14 0"/><path d="M52 64 C 68 61, 88 49, 103 27"/><path d="M55 67 C 72 67, 92 60, 107 47"/><path d="M57 71 C 71 77, 88 78, 101 71"/></g></svg>
+          Simorgh
+        </div>
+        <nav class="nav">
+          <a class="active" href="#">▦ Dashboard</a>
+          <a href="#">🎛 Devices</a>
+          <a href="#">⚙ Engines</a>
+          <a href="#">⬇ Models</a>
+          <a href="#">🕘 History</a>
+          <a href="#">☰ Settings</a>
+        </nav>
+      </div>
+      <div class="main">
+        <div class="statusline">
+          <span><span class="pulse"></span>2 pipelines running</span>
+          <span>GPU: RTX 3090</span>
+          <span>VRAM 9.8 / 24 GB</span>
+          <span>Hotkey: Ctrl+Shift+Space</span>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><span class="card-title">Pipeline A — Listen &amp; subtitle</span><span class="toggle"></span></div>
+          <div class="chips">
+            <span class="chip">🔊 Speakers <small>loopback</small></span><span class="arrow">→</span>
+            <span class="chip">Whisper large-v3 <small>local</small></span><span class="arrow">→</span>
+            <span class="chip">GPT-4o mini <small>API</small></span><span class="arrow">→</span>
+            <span class="chip">فارسی → Overlay</span>
+          </div>
+          <div class="meterrow">
+            <div class="vu"><i style="height:8px"></i><i style="height:14px;animation-delay:.1s"></i><i style="height:22px;animation-delay:.2s"></i><i style="height:17px;animation-delay:.3s"></i><i style="height:24px;animation-delay:.15s"></i><i style="height:12px;animation-delay:.25s"></i><i style="height:19px;animation-delay:.05s"></i></div>
+            <div class="badges"><span class="badge good">end-to-end 1.9s</span><span class="badge">STT 0.8s</span><span class="badge">MT 0.6s</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><span class="card-title">Pipeline B — Speak &amp; translate</span><span class="toggle"></span></div>
+          <div class="chips">
+            <span class="chip">🎙 USB Mic</span><span class="arrow">→</span>
+            <span class="chip">Whisper medium <small>fa · local</small></span><span class="arrow">→</span>
+            <span class="chip">GPT-4o mini <small>API</small></span><span class="arrow">→</span>
+            <span class="chip">Kokoro TTS <small>local</small></span><span class="arrow">→</span>
+            <span class="chip">🎤 Simorgh Out <small>virtual mic</small></span>
+          </div>
+          <div class="meterrow">
+            <div class="vu"><i style="height:10px;animation-delay:.2s"></i><i style="height:20px"></i><i style="height:15px;animation-delay:.35s"></i><i style="height:23px;animation-delay:.1s"></i><i style="height:11px;animation-delay:.28s"></i><i style="height:18px;animation-delay:.18s"></i><i style="height:9px;animation-delay:.08s"></i></div>
+            <div class="badges"><span class="badge good">end-to-end 2.6s</span><span class="badge">push-to-talk: Space</span></div>
+          </div>
+        </div>
+
+        <div class="transcript">
+          <div class="thead">Live transcript</div>
+          <div class="trow"><span class="ts">14:02:11</span><span>Let's move on to the quarterly numbers.</span><span class="fa">بریم سراغ آمار سه‌ماهه.</span></div>
+          <div class="trow"><span class="ts">14:02:16</span><span>Revenue grew twelve percent over last quarter.</span><span class="fa">درآمد نسبت به سه‌ماههٔ قبل دوازده درصد رشد کرد.</span></div>
+          <div class="trow partial"><span class="ts">14:02:21</span><span>And if you look at the churn…</span><span class="fa">و اگر به ریزش مشتری نگاه کنید…</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section">2 · Subtitle overlay</h2>
+  <p class="section-sub">Frameless, always-on-top, click-through, draggable. Dimmed source line on top, large RTL Persian below. Provisional words render at 50% opacity and solidify when finalized — finalized text never flickers.</p>
+  <div class="window">
+    <div class="scene">
+      <span class="scenehint">▶ Any app underneath — video call, movie, lecture…</span>
+      <div class="overlay">
+        <div class="ov-src">Revenue grew twelve percent over last quarter, and if you look at…</div>
+        <div class="ov-dst">درآمد نسبت به سه‌ماههٔ قبل دوازده درصد رشد کرد، <span class="part">و اگر نگاه کنید به…</span></div>
+        <div class="ov-foot"><span>≡ drag · scroll to resize</span><span>1.9s behind live</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section">3 · First-run wizard</h2>
+  <p class="section-sub">Light theme, five steps. Users cannot continue until every selected device is verified with a live meter — the “✓ Receiving audio” moment builds trust before any AI runs.</p>
+  <div class="window" style="background:var(--l-canvas)">
+    <div class="titlebar" style="background:var(--l-soft);border-bottom:1px solid var(--l-border)"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="tname" style="color:var(--l-ink2)">Simorgh — Setup</span></div>
+    <div class="wizard">
+      <div class="steps">
+        <span class="step done"><span class="stepnum">✓</span> Welcome</span><span class="stepbar"></span>
+        <span class="step cur"><span class="stepnum">2</span> Devices</span><span class="stepbar"></span>
+        <span class="step"><span class="stepnum">3</span> Engines</span><span class="stepbar"></span>
+        <span class="step"><span class="stepnum">4</span> Models</span><span class="stepbar"></span>
+        <span class="step"><span class="stepnum">5</span> Test</span>
+      </div>
+      <h3>Pick your audio devices</h3>
+      <p class="wsub">Simorgh listens to one output (what you hear) and one microphone (your voice). Play any sound and speak to verify both.</p>
+      <div class="field">
+        <label>Listen to (output device — loopback)</label>
+        <div class="select"><span>🔊 Speakers — Realtek HD Audio</span><span class="arr">▼</span></div>
+        <div class="lmeter"><span class="lbar"><i></i></span> ✓ Receiving audio</div>
+      </div>
+      <div class="field">
+        <label>Your microphone</label>
+        <div class="select"><span>🎙 USB Microphone — Samson Q2U</span><span class="arr">▼</span></div>
+        <div class="lmeter"><span class="lbar"><i style="width:38%"></i></span> ✓ Receiving audio</div>
+      </div>
+      <div class="wbtns"><button class="btn">Back</button><button class="btn primary">Continue</button></div>
+    </div>
+  </div>
+
+  <h2 class="section">4 · Engine picker</h2>
+  <p class="section-sub">One anatomy for all three stages: a Local ↔ API switch, a model dropdown, and honest badges (VRAM, cost, streaming, custom base URL). Downloads show inline progress. Changes apply live — no restart.</p>
+  <div class="window">
+    <div class="titlebar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="tname">Simorgh — Engines</span></div>
+    <div class="engines">
+      <div class="ecard">
+        <div class="stage">Speech to text</div>
+        <div class="seg"><span class="on">Local</span><span>API</span></div>
+        <div class="eselect"><span>Whisper large-v3</span><span>▼</span></div>
+        <div class="ebadges"><span class="badge good">GPU · 5 GB</span><span class="badge">streaming</span><span class="badge">offline</span></div>
+      </div>
+      <div class="ecard">
+        <div class="stage">Translation</div>
+        <div class="seg"><span>Local</span><span class="on">API</span></div>
+        <div class="eselect"><span>GPT-4o mini</span><span>▼</span></div>
+        <div class="ebadges"><span class="badge">~$0.02/hr</span><span class="badge">custom base URL</span><span class="badge good">proxy ✓</span></div>
+      </div>
+      <div class="ecard">
+        <div class="stage">Text to speech</div>
+        <div class="seg"><span class="on">Local</span><span>API</span></div>
+        <div class="eselect"><span>Kokoro v1 — en_male_2</span><span>▼</span></div>
+        <div class="ebadges"><span class="badge good">GPU · 0.9 GB</span><span class="badge">streaming</span></div>
+        <div class="progress">Downloading voice pack… 64%<div class="pbar"><i></i></div></div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section">Design principles</h2>
+  <div class="principles">
+    <div class="pcard"><h4>Show the signal path</h4><p>Audio routing is always visible as chips with arrows. Every chip is clickable and jumps to its setting — no hidden state.</p></div>
+    <div class="pcard"><h4>Prove, don’t promise</h4><p>Live meters and real latency numbers wherever audio flows. Never a bare “Running” label the user has to trust blindly.</p></div>
+    <div class="pcard"><h4>Partial → final</h4><p>Streaming text appears provisionally at reduced opacity and solidifies when finalized. Finalized text never rewrites or flickers.</p></div>
+    <div class="pcard"><h4>RTL is first-class</h4><p>Persian gets proper shaping, fonts, and right-aligned columns — and the whole UI mirrors when the app language is Persian.</p></div>
+  </div>
+</div>
+</body>
+</html>

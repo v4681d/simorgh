@@ -1,0 +1,48 @@
+[workspace]
+resolver = "2"
+members = [
+  "crates/core",
+  "crates/audio",
+  "crates/engines-stt",
+  "crates/engines-mt",
+  "crates/engines-tts",
+  "crates/app",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+repository = "https://github.com/simorgh-app/simorgh"
+authors = ["Simorgh contributors"]
+
+[workspace.dependencies]
+simorgh-core = { path = "crates/core" }
+simorgh-audio = { path = "crates/audio" }
+simorgh-engines-stt = { path = "crates/engines-stt" }
+simorgh-engines-mt = { path = "crates/engines-mt" }
+simorgh-engines-tts = { path = "crates/engines-tts" }
+
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "fs", "process", "io-util"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+thiserror = "1"
+anyhow = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-appender = "0.2"
+async-trait = "0.1"
+futures = "0.3"
+bytes = "1"
+reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "rustls-tls", "socks"] }
+tokio-tungstenite = { version = "0.23", features = ["rustls-tls-webpki-roots"] }
+keyring = "3"
+directories = "5"
+uuid = { version = "1", features = ["v4"] }
+notify = "6"
+sha2 = "0.10"
+
+[profile.release]
+lto = "thin"
+strip = true

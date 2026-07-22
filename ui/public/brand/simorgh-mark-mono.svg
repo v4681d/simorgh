@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <!-- Single-color glyph. Replace #2C2C2B with any color, or use currentColor when inlining. -->
+  <g fill="none" stroke="#2C2C2B" stroke-width="9" stroke-linecap="round">
+    <path d="M10 64 q7 -16 14 0 t14 0 t14 0"/>
+    <path d="M52 64 C 68 61, 88 49, 103 27"/>
+    <path d="M55 67 C 72 67, 92 60, 107 47"/>
+    <path d="M57 71 C 71 77, 88 78, 101 71"/>
+  </g>
+</svg>

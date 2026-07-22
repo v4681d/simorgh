@@ -1,0 +1,79 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "devices": "Devices",
+    "engines": "Engines",
+    "models": "Models",
+    "history": "History",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "pipelineA": "Listen & subtitle",
+    "pipelineB": "Speak & translate",
+    "endToEnd": "end-to-end",
+    "pushToTalk": "Push to talk",
+    "liveTranscript": "Live transcript",
+    "behindLive": "{{seconds}}s behind live",
+    "running": "Running",
+    "stopped": "Stopped"
+  },
+  "devices": {
+    "title": "Devices",
+    "loopback": "System audio (loopback)",
+    "microphone": "Microphone",
+    "virtualMic": "Virtual microphone",
+    "receivingAudio": "✓ Receiving audio",
+    "refresh": "Refresh devices"
+  },
+  "engines": {
+    "stt": "Speech to text",
+    "translation": "Translation",
+    "tts": "Text to speech",
+    "local": "Local",
+    "api": "API",
+    "model": "Model",
+    "baseUrl": "Base URL",
+    "apiKey": "API key",
+    "proxy": "Proxy (HTTP/SOCKS5)",
+    "streaming": "streaming",
+    "offline": "offline"
+  },
+  "models": {
+    "title": "Model manager",
+    "download": "Download",
+    "delete": "Delete",
+    "diskUsage": "Disk usage"
+  },
+  "history": {
+    "title": "Subtitle history",
+    "exportTxt": "Export TXT",
+    "exportSrt": "Export SRT",
+    "copy": "Copy"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "App language",
+    "theme": "Theme",
+    "latencyAccuracy": "Latency ↔ Accuracy",
+    "silenceEnd": "Silence to end phrase",
+    "maxChunk": "Max chunk window",
+    "debounce": "Re-translation debounce",
+    "openMic": "Open mic mode",
+    "hotkey": "Toggle pipelines hotkey"
+  },
+  "wizard": {
+    "welcome": "Welcome",
+    "devices": "Devices",
+    "engines": "Engines",
+    "models": "Models",
+    "test": "Test",
+    "welcomeTitle": "Welcome to Simorgh",
+    "welcomeBody": "Real-time speech translation between English and Persian. Let's set up your audio and engines — it takes about two minutes.",
+    "next": "Continue",
+    "back": "Back",
+    "finish": "Finish"
+  },
+  "overlay": {
+    "dragHint": "Drag to move · scroll to resize"
+  }
+}

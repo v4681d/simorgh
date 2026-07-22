@@ -1,0 +1,27 @@
+[package]
+name = "simorgh-audio"
+description = "Device enumeration, capture, loopback, virtual microphone, VAD, meters"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[features]
+default = ["cpal-backend", "silero"]
+cpal-backend = ["dep:cpal"]
+# Silero VAD via ONNX Runtime; falls back to the energy VAD when disabled.
+silero = ["dep:ort", "dep:ndarray"]
+
+[dependencies]
+simorgh-core.workspace = true
+tokio.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+async-trait.workspace = true
+cpal = { version = "0.15", optional = true }
+ort = { version = "2.0.0-rc.4", optional = true, default-features = false }
+ndarray = { version = "0.15", optional = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util"] }

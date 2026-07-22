@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 160">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2783DE"/>
+      <stop offset="1" stop-color="#46A171"/>
+    </linearGradient>
+  </defs>
+  <!-- RTL layout: mark sits on the right, text flows leftward from it -->
+  <g transform="translate(428,20)" fill="none" stroke="url(#g)" stroke-width="9" stroke-linecap="round">
+    <path d="M10 64 q7 -16 14 0 t14 0 t14 0"/>
+    <path d="M52 64 C 68 61, 88 49, 103 27"/>
+    <path d="M55 67 C 72 67, 92 60, 107 47"/>
+    <path d="M57 71 C 71 77, 88 78, 101 71"/>
+  </g>
+  <text x="404" y="92" direction="rtl" text-anchor="start" font-family="Noto Sans Arabic, sans-serif" font-size="54" font-weight="700" fill="#2C2C2B">سیمرغ</text>
+  <text x="402" y="126" direction="rtl" text-anchor="start" font-family="Noto Sans Arabic, sans-serif" font-size="19" fill="#7D7A75">مترجم همزمان گفتار</text>
+</svg>

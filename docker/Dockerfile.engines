@@ -1,0 +1,12 @@
+# Self-hosted engine stack for Simorgh: an OpenAI-compatible LLM server for
+# translation. Point Simorgh's Translation engine (OpenAI-compatible) at
+# http://localhost:11434/v1 — no cloud, no keys.
+#
+# Usage: docker compose up  (see ../docker-compose.yml)
+FROM ollama/ollama:latest
+
+# Pre-pull a translation-capable model at build time (optional; comment out
+# to pull at first run instead).
+# RUN ollama serve & sleep 5 && ollama pull qwen2.5:7b
+
+EXPOSE 11434

@@ -1,0 +1,79 @@
+{
+  "nav": {
+    "dashboard": "پیشخوان",
+    "devices": "دستگاه‌ها",
+    "engines": "موتورها",
+    "models": "مدل‌ها",
+    "history": "تاریخچه",
+    "settings": "تنظیمات"
+  },
+  "dashboard": {
+    "pipelineA": "شنیدن و زیرنویس",
+    "pipelineB": "گفتن و ترجمه",
+    "endToEnd": "سرتاسری",
+    "pushToTalk": "فشار برای صحبت",
+    "liveTranscript": "رونوشت زنده",
+    "behindLive": "{{seconds}} ثانیه عقب‌تر از پخش زنده",
+    "running": "در حال اجرا",
+    "stopped": "متوقف"
+  },
+  "devices": {
+    "title": "دستگاه‌ها",
+    "loopback": "صدای سیستم (لوپ‌بک)",
+    "microphone": "میکروفون",
+    "virtualMic": "میکروفون مجازی",
+    "receivingAudio": "✓ صدا دریافت می‌شود",
+    "refresh": "به‌روزرسانی دستگاه‌ها"
+  },
+  "engines": {
+    "stt": "گفتار به متن",
+    "translation": "ترجمه",
+    "tts": "متن به گفتار",
+    "local": "محلی",
+    "api": "API",
+    "model": "مدل",
+    "baseUrl": "آدرس پایه",
+    "apiKey": "کلید API",
+    "proxy": "پروکسی (HTTP/SOCKS5)",
+    "streaming": "جریانی",
+    "offline": "آفلاین"
+  },
+  "models": {
+    "title": "مدیریت مدل‌ها",
+    "download": "دانلود",
+    "delete": "حذف",
+    "diskUsage": "فضای اشغال‌شده"
+  },
+  "history": {
+    "title": "تاریخچه زیرنویس‌ها",
+    "exportTxt": "خروجی TXT",
+    "exportSrt": "خروجی SRT",
+    "copy": "کپی"
+  },
+  "settings": {
+    "title": "تنظیمات",
+    "language": "زبان برنامه",
+    "theme": "پوسته",
+    "latencyAccuracy": "تأخیر ↔ دقت",
+    "silenceEnd": "سکوت برای پایان عبارت",
+    "maxChunk": "حداکثر طول قطعه",
+    "debounce": "تأخیر ترجمه مجدد",
+    "openMic": "حالت میکروفون باز",
+    "hotkey": "کلید میانبر خطوط لوله"
+  },
+  "wizard": {
+    "welcome": "خوش آمدید",
+    "devices": "دستگاه‌ها",
+    "engines": "موتورها",
+    "models": "مدل‌ها",
+    "test": "آزمایش",
+    "welcomeTitle": "به سیمرغ خوش آمدید",
+    "welcomeBody": "ترجمه همزمان گفتار بین فارسی و انگلیسی. بیایید صدا و موتورها را تنظیم کنیم — حدود دو دقیقه طول می‌کشد.",
+    "next": "ادامه",
+    "back": "بازگشت",
+    "finish": "پایان"
+  },
+  "overlay": {
+    "dragHint": "برای جابه‌جایی بکشید · برای تغییر اندازه اسکرول کنید"
+  }
+}

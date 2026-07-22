@@ -1,0 +1,43 @@
+[package]
+name = "simorgh"
+description = "Real-time bidirectional speech translation — سیمرغ"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[features]
+default = []
+whisper = ["simorgh-engines-stt/whisper"]
+cuda = ["simorgh-engines-stt/cuda"]
+metal = ["simorgh-engines-stt/metal"]
+vulkan = ["simorgh-engines-stt/vulkan"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+simorgh-core.workspace = true
+simorgh-audio.workspace = true
+simorgh-engines-stt.workspace = true
+simorgh-engines-mt.workspace = true
+simorgh-engines-tts.workspace = true
+tauri = { version = "2", features = ["tray-icon"] }
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-updater = "2"
+tauri-plugin-dialog = "2"
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+tracing-appender.workspace = true
+keyring.workspace = true
+sha2.workspace = true
+directories.workspace = true
+reqwest.workspace = true
+futures.workspace = true
+uuid.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util"] }
