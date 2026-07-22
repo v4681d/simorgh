@@ -35,7 +35,7 @@ jobs:
             libayatana-appindicator3-dev librsvg2-dev libssl-dev patchelf cmake
       - run: npm ci --prefix ui
       - name: Build bundles
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # whisper.cpp's ggml uses std::filesystem, which needs macOS >= 10.15.

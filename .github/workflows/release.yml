@@ -54,7 +54,7 @@ jobs:
             libayatana-appindicator3-dev librsvg2-dev libssl-dev patchelf cmake
       - run: npm ci --prefix ui
       - name: Build and bundle (draft release)
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
