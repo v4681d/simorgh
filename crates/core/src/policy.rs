@@ -18,7 +18,11 @@ pub struct PolicySettings {
 
 impl Default for PolicySettings {
     fn default() -> Self {
-        Self { silence_end_ms: 600, max_chunk_ms: 6_000, retranslate_debounce_ms: 1_000 }
+        Self {
+            silence_end_ms: 600,
+            max_chunk_ms: 6_000,
+            retranslate_debounce_ms: 1_000,
+        }
     }
 }
 
@@ -33,12 +37,18 @@ pub struct RetranslationPolicy {
 
 impl RetranslationPolicy {
     pub fn new(settings: PolicySettings) -> Self {
-        Self { settings, last_emit_ms: 0, pending: None }
+        Self {
+            settings,
+            last_emit_ms: 0,
+            pending: None,
+        }
     }
 }
 
 impl CommitPolicy for RetranslationPolicy {
-    fn id(&self) -> &'static str { "retranslation" }
+    fn id(&self) -> &'static str {
+        "retranslation"
+    }
 
     fn on_transcript(&mut self, seg: &TranscriptSegment, now_ms: u64) -> CommitDecision {
         if seg.is_final {
@@ -85,7 +95,12 @@ pub struct ClauseCommitPolicy {
 
 impl ClauseCommitPolicy {
     pub fn new(settings: PolicySettings) -> Self {
-        Self { settings, chunk_started_ms: None, current_text: String::new(), committed_len: 0 }
+        Self {
+            settings,
+            chunk_started_ms: None,
+            current_text: String::new(),
+            committed_len: 0,
+        }
     }
 
     fn uncommitted(&self) -> &str {
@@ -104,7 +119,9 @@ impl ClauseCommitPolicy {
 }
 
 impl CommitPolicy for ClauseCommitPolicy {
-    fn id(&self) -> &'static str { "clause_commit" }
+    fn id(&self) -> &'static str {
+        "clause_commit"
+    }
 
     fn on_transcript(&mut self, seg: &TranscriptSegment, now_ms: u64) -> CommitDecision {
         if self.chunk_started_ms.is_none() {
@@ -126,7 +143,9 @@ impl CommitPolicy for ClauseCommitPolicy {
 
     fn on_tick(&mut self, now_ms: u64) -> CommitDecision {
         if let Some(start) = self.chunk_started_ms {
-            if now_ms.saturating_sub(start) >= self.settings.max_chunk_ms && !self.uncommitted().trim().is_empty() {
+            if now_ms.saturating_sub(start) >= self.settings.max_chunk_ms
+                && !self.uncommitted().trim().is_empty()
+            {
                 // Forced commit: never let a rambling sentence stall the pipe.
                 return self.commit_all();
             }
@@ -154,18 +173,32 @@ mod tests {
     #[test]
     fn retranslation_debounces_partials_and_commits_finals() {
         let mut p = RetranslationPolicy::new(PolicySettings::default());
-        assert!(matches!(p.on_transcript(&seg("hello", false), 1_000), CommitDecision::Provisional(_)));
-        assert!(matches!(p.on_transcript(&seg("hello wor", false), 1_200), CommitDecision::Hold));
+        assert!(matches!(
+            p.on_transcript(&seg("hello", false), 1_000),
+            CommitDecision::Provisional(_)
+        ));
+        assert!(matches!(
+            p.on_transcript(&seg("hello wor", false), 1_200),
+            CommitDecision::Hold
+        ));
         assert!(matches!(p.on_tick(2_100), CommitDecision::Provisional(t) if t == "hello wor"));
-        assert!(matches!(p.on_transcript(&seg("hello world", true), 2_200), CommitDecision::Commit(t) if t == "hello world"));
+        assert!(
+            matches!(p.on_transcript(&seg("hello world", true), 2_200), CommitDecision::Commit(t) if t == "hello world")
+        );
     }
 
     #[test]
     fn clause_commit_waits_for_boundary() {
         let mut p = ClauseCommitPolicy::new(PolicySettings::default());
         // Growing Persian clause: no commit until the boundary (verb arrives at end).
-        assert!(matches!(p.on_transcript(&seg("من فردا", false), 0), CommitDecision::Hold));
-        assert!(matches!(p.on_transcript(&seg("من فردا به مدرسه", false), 500), CommitDecision::Hold));
+        assert!(matches!(
+            p.on_transcript(&seg("من فردا", false), 0),
+            CommitDecision::Hold
+        ));
+        assert!(matches!(
+            p.on_transcript(&seg("من فردا به مدرسه", false), 500),
+            CommitDecision::Hold
+        ));
         let d = p.on_speech_end(&seg("من فردا به مدرسه می‌روم", false));
         assert!(matches!(d, CommitDecision::Commit(t) if t.ends_with("می‌روم")));
     }
@@ -173,7 +206,10 @@ mod tests {
     #[test]
     fn clause_commit_forces_after_max_window() {
         let mut p = ClauseCommitPolicy::new(PolicySettings::default());
-        assert!(matches!(p.on_transcript(&seg("a very long ramble", false), 0), CommitDecision::Hold));
+        assert!(matches!(
+            p.on_transcript(&seg("a very long ramble", false), 0),
+            CommitDecision::Hold
+        ));
         assert!(matches!(p.on_tick(5_999), CommitDecision::Hold));
         assert!(matches!(p.on_tick(6_000), CommitDecision::Commit(_)));
     }

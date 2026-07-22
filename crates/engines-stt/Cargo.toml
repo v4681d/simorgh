@@ -28,7 +28,7 @@ tokio-tungstenite.workspace = true
 uuid.workspace = true
 keyring.workspace = true
 directories.workspace = true
-whisper-rs = { version = "0.12", optional = true }
+whisper-rs = { version = "0.16", optional = true }
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["test-util"] }

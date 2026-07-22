@@ -1,4 +1,7 @@
-#![cfg_attr(all(not(debug_assertions), target_os = "windows"), windows_subsystem = "windows")]
+#![cfg_attr(
+    all(not(debug_assertions), target_os = "windows"),
+    windows_subsystem = "windows"
+)]
 
 //! Simorgh (سیمرغ) — real-time bidirectional speech translation.
 
@@ -57,10 +60,16 @@ fn main() {
 fn init_logging() {
     let file_appender = tracing_appender::rolling::daily(log_dir(), "simorgh.log");
     tracing_subscriber::registry()
-        .with(tracing_subscriber::EnvFilter::try_from_default_env()
-            .unwrap_or_else(|_| "info,simorgh=debug".into()))
+        .with(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| "info,simorgh=debug".into()),
+        )
         .with(tracing_subscriber::fmt::layer())
-        .with(tracing_subscriber::fmt::layer().with_ansi(false).with_writer(file_appender))
+        .with(
+            tracing_subscriber::fmt::layer()
+                .with_ansi(false)
+                .with_writer(file_appender),
+        )
         .init();
 }
 

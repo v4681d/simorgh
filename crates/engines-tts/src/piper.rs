@@ -24,7 +24,10 @@ pub struct PiperTts {
 
 impl PiperTts {
     pub fn new(choice: &EngineChoice) -> Result<Self> {
-        let voice_name = choice.model.clone().unwrap_or_else(|| "en_US-lessac-medium".into());
+        let voice_name = choice
+            .model
+            .clone()
+            .unwrap_or_else(|| "en_US-lessac-medium".into());
         let voice_path = crate::models_dir().join(format!("{voice_name}.onnx"));
         if !voice_path.exists() {
             return Err(Error::ModelMissing {
@@ -32,15 +35,24 @@ impl PiperTts {
                 fix: "Open Models and download it (Settings → Models)".into(),
             });
         }
-        Ok(Self { voice_path, voice_name })
+        Ok(Self {
+            voice_path,
+            voice_name,
+        })
     }
 }
 
 #[async_trait]
 impl TtsEngine for PiperTts {
-    fn id(&self) -> &'static str { "piper" }
-    fn display_name(&self) -> String { format!("Piper {} (local)", self.voice_name) }
-    fn is_local(&self) -> bool { true }
+    fn id(&self) -> &'static str {
+        "piper"
+    }
+    fn display_name(&self) -> String {
+        format!("Piper {} (local)", self.voice_name)
+    }
+    fn is_local(&self) -> bool {
+        true
+    }
 
     async fn synthesize(
         &self,
@@ -49,7 +61,8 @@ impl TtsEngine for PiperTts {
         audio_tx: mpsc::Sender<AudioFrame>,
     ) -> Result<()> {
         let mut child = tokio::process::Command::new("piper")
-            .arg("--model").arg(&self.voice_path)
+            .arg("--model")
+            .arg(&self.voice_path)
             .arg("--output-raw")
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
@@ -74,11 +87,18 @@ impl TtsEngine for PiperTts {
             let mut filled = 0;
             // Fill a whole frame (or hit EOF).
             while filled < byte_buf.len() {
-                let n = stdout.read(&mut byte_buf[filled..]).await.map_err(Error::Io)?;
-                if n == 0 { break; }
+                let n = stdout
+                    .read(&mut byte_buf[filled..])
+                    .await
+                    .map_err(Error::Io)?;
+                if n == 0 {
+                    break;
+                }
                 filled += n;
             }
-            if filled == 0 { break; }
+            if filled == 0 {
+                break;
+            }
             let samples: Vec<f32> = byte_buf[..filled]
                 .chunks_exact(2)
                 .map(|b| i16::from_le_bytes([b[0], b[1]]) as f32 / 32768.0)
@@ -89,8 +109,12 @@ impl TtsEngine for PiperTts {
                 captured_at: Instant::now(),
                 self_generated: true, // anti-feedback gate depends on this
             };
-            if audio_tx.send(frame).await.is_err() { break; }
-            if filled < byte_buf.len() { break; } // EOF mid-frame
+            if audio_tx.send(frame).await.is_err() {
+                break;
+            }
+            if filled < byte_buf.len() {
+                break;
+            } // EOF mid-frame
         }
         let _ = child.wait().await;
         Ok(())

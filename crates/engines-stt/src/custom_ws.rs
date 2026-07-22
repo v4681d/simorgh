@@ -34,9 +34,15 @@ impl CustomEndpointStt {
 
 #[async_trait]
 impl SttEngine for CustomEndpointStt {
-    fn id(&self) -> &'static str { "custom" }
-    fn display_name(&self) -> String { format!("Custom endpoint ({})", self.base_url) }
-    fn is_local(&self) -> bool { false }
+    fn id(&self) -> &'static str {
+        "custom"
+    }
+    fn display_name(&self) -> String {
+        format!("Custom endpoint ({})", self.base_url)
+    }
+    fn is_local(&self) -> bool {
+        false
+    }
 
     async fn start_session(
         &self,
@@ -48,12 +54,18 @@ impl SttEngine for CustomEndpointStt {
             return Err(Error::Engine {
                 engine: "custom".into(),
                 message: "HTTP mode not yet wired; use a ws:// endpoint".into(),
-                fix: Some("Use a WebSocket endpoint, or the openai-stt adapter for HTTP servers".into()),
+                fix: Some(
+                    "Use a WebSocket endpoint, or the openai-stt adapter for HTTP servers".into(),
+                ),
             });
         }
         let (ws, _) = tokio_tungstenite::connect_async(&self.base_url)
             .await
-            .map_err(|e| Error::Engine { engine: "custom".into(), message: e.to_string(), fix: None })?;
+            .map_err(|e| Error::Engine {
+                engine: "custom".into(),
+                message: e.to_string(),
+                fix: None,
+            })?;
         let (mut sink, mut stream) = ws.split();
 
         let uplink = tokio::spawn(async move {
@@ -62,22 +74,36 @@ impl SttEngine for CustomEndpointStt {
                 for s in &frame.samples {
                     bytes.extend_from_slice(&((s.clamp(-1.0, 1.0) * 32767.0) as i16).to_le_bytes());
                 }
-                if sink.send(Message::Binary(bytes)).await.is_err() { break; }
+                if sink.send(Message::Binary(bytes)).await.is_err() {
+                    break;
+                }
             }
         });
 
         let handle = tokio::spawn(async move {
             let mut seg_id = uuid::Uuid::new_v4();
             while let Some(Ok(Message::Text(text))) = stream.next().await {
-                let Ok(v) = serde_json::from_str::<serde_json::Value>(&text) else { continue };
-                let Some(t) = v["text"].as_str().filter(|t| !t.is_empty()) else { continue };
+                let Ok(v) = serde_json::from_str::<serde_json::Value>(&text) else {
+                    continue;
+                };
+                let Some(t) = v["text"].as_str().filter(|t| !t.is_empty()) else {
+                    continue;
+                };
                 let is_final = v["final"].as_bool().unwrap_or(false);
                 let seg = TranscriptSegment {
-                    id: seg_id, text: t.to_string(), lang: lang.clone(),
-                    is_final, t_start: 0.0, t_end: 0.0,
+                    id: seg_id,
+                    text: t.to_string(),
+                    lang: lang.clone(),
+                    is_final,
+                    t_start: 0.0,
+                    t_end: 0.0,
                 };
-                if segments_tx.send(seg).await.is_err() { break; }
-                if is_final { seg_id = uuid::Uuid::new_v4(); }
+                if segments_tx.send(seg).await.is_err() {
+                    break;
+                }
+                if is_final {
+                    seg_id = uuid::Uuid::new_v4();
+                }
             }
             uplink.abort();
             Ok(())

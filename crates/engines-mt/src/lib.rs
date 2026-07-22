@@ -23,7 +23,9 @@ use std::sync::Arc;
 
 pub fn create(choice: &EngineChoice) -> Result<Arc<dyn Translator>> {
     match choice.engine.as_str() {
-        "openai-compat" => Ok(Arc::new(openai_compat::OpenAiCompatTranslator::new(choice)?)),
+        "openai-compat" => Ok(Arc::new(openai_compat::OpenAiCompatTranslator::new(
+            choice,
+        )?)),
         "deepl" => Ok(Arc::new(deepl::DeepLTranslator::new(choice)?)),
         "google" => Ok(Arc::new(google::GoogleTranslator::new(choice)?)),
         "mock" => Ok(Arc::new(mock::MockTranslator)),

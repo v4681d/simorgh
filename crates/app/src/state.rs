@@ -62,7 +62,9 @@ impl AppState {
     }
 
     pub fn persist_overlay_bounds(&self, window: &tauri::Window) {
-        let (Ok(pos), Ok(size)) = (window.outer_position(), window.outer_size()) else { return };
+        let (Ok(pos), Ok(size)) = (window.outer_position(), window.outer_size()) else {
+            return;
+        };
         let mut cfg = self.config.lock().expect("config lock");
         cfg.subtitle.x = Some(pos.x);
         cfg.subtitle.y = Some(pos.y);

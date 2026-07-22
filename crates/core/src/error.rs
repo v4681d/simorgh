@@ -9,7 +9,11 @@ pub enum Error {
     #[error("audio device error: {0}")]
     Audio(String),
     #[error("engine `{engine}` failed: {message}")]
-    Engine { engine: String, message: String, fix: Option<String> },
+    Engine {
+        engine: String,
+        message: String,
+        fix: Option<String>,
+    },
     #[error("model not available: {model}")]
     ModelMissing { model: String, fix: String },
     #[error("configuration error: {0}")]

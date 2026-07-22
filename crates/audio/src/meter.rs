@@ -21,19 +21,26 @@ pub struct LevelMeter {
 
 impl LevelMeter {
     pub fn feed(&self, samples: &[f32]) {
-        if samples.is_empty() { return; }
+        if samples.is_empty() {
+            return;
+        }
         let rms = (samples.iter().map(|s| s * s).sum::<f32>() / samples.len() as f32).sqrt();
         let peak = samples.iter().fold(0.0f32, |m, s| m.max(s.abs()));
         self.rms_bits.store(rms.to_bits(), Ordering::Relaxed);
         let prev = f32::from_bits(self.peak_bits.load(Ordering::Relaxed));
         // Peak decays so the meter falls back naturally.
-        self.peak_bits.store(peak.max(prev * 0.92).to_bits(), Ordering::Relaxed);
+        self.peak_bits
+            .store(peak.max(prev * 0.92).to_bits(), Ordering::Relaxed);
     }
 
     pub fn read(&self) -> Level {
         let rms = f32::from_bits(self.rms_bits.load(Ordering::Relaxed));
         let peak = f32::from_bits(self.peak_bits.load(Ordering::Relaxed));
-        Level { rms, peak, rms_db: if rms > 0.0 { 20.0 * rms.log10() } else { -96.0 } }
+        Level {
+            rms,
+            peak,
+            rms_db: if rms > 0.0 { 20.0 * rms.log10() } else { -96.0 },
+        }
     }
 }
 

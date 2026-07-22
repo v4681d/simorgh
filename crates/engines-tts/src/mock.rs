@@ -12,11 +12,22 @@ pub struct MockTts;
 
 #[async_trait]
 impl TtsEngine for MockTts {
-    fn id(&self) -> &'static str { "mock" }
-    fn display_name(&self) -> String { "Mock TTS (testing)".into() }
-    fn is_local(&self) -> bool { true }
+    fn id(&self) -> &'static str {
+        "mock"
+    }
+    fn display_name(&self) -> String {
+        "Mock TTS (testing)".into()
+    }
+    fn is_local(&self) -> bool {
+        true
+    }
 
-    async fn synthesize(&self, _text: &str, _lang: Lang, audio_tx: mpsc::Sender<AudioFrame>) -> Result<()> {
+    async fn synthesize(
+        &self,
+        _text: &str,
+        _lang: Lang,
+        audio_tx: mpsc::Sender<AudioFrame>,
+    ) -> Result<()> {
         for _ in 0..5 {
             let frame = AudioFrame {
                 samples: vec![0.0; 1600], // 100 ms @ 16 kHz
@@ -24,7 +35,9 @@ impl TtsEngine for MockTts {
                 captured_at: Instant::now(),
                 self_generated: true,
             };
-            if audio_tx.send(frame).await.is_err() { break; }
+            if audio_tx.send(frame).await.is_err() {
+                break;
+            }
         }
         Ok(())
     }

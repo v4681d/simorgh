@@ -16,7 +16,9 @@ impl GoogleTranslator {
     pub fn new(choice: &EngineChoice) -> Result<Self> {
         Ok(Self {
             client: crate::http_client(choice)?,
-            base_url: choice.base_url.clone().unwrap_or_else(|| "https://translation.googleapis.com/language/translate/v2".into()),
+            base_url: choice.base_url.clone().unwrap_or_else(|| {
+                "https://translation.googleapis.com/language/translate/v2".into()
+            }),
             api_key: crate::api_key(choice)?,
         })
     }
@@ -24,9 +26,15 @@ impl GoogleTranslator {
 
 #[async_trait]
 impl Translator for GoogleTranslator {
-    fn id(&self) -> &'static str { "google" }
-    fn display_name(&self) -> String { "Google Translate (API)".into() }
-    fn is_local(&self) -> bool { false }
+    fn id(&self) -> &'static str {
+        "google"
+    }
+    fn display_name(&self) -> String {
+        "Google Translate (API)".into()
+    }
+    fn is_local(&self) -> bool {
+        false
+    }
 
     async fn translate(&self, text: &str, pair: &LangPair) -> Result<String> {
         let resp = self
@@ -46,10 +54,17 @@ impl Translator for GoogleTranslator {
             return Err(err(format!("HTTP {}", resp.status())));
         }
         let body: serde_json::Value = resp.json().await.map_err(|e| err(e.to_string()))?;
-        Ok(body["data"]["translations"][0]["translatedText"].as_str().unwrap_or_default().to_string())
+        Ok(body["data"]["translations"][0]["translatedText"]
+            .as_str()
+            .unwrap_or_default()
+            .to_string())
     }
 }
 
 fn err(message: String) -> Error {
-    Error::Engine { engine: "google".into(), message, fix: Some("Check your Google API key in Settings → Engines".into()) }
+    Error::Engine {
+        engine: "google".into(),
+        message,
+        fix: Some("Check your Google API key in Settings → Engines".into()),
+    }
 }

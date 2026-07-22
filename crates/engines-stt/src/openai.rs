@@ -23,7 +23,10 @@ impl OpenAiStt {
     pub fn new(choice: &EngineChoice) -> Result<Self> {
         Ok(Self {
             client: crate::http_client(choice)?,
-            base_url: choice.base_url.clone().unwrap_or_else(|| "https://api.openai.com/v1".into()),
+            base_url: choice
+                .base_url
+                .clone()
+                .unwrap_or_else(|| "https://api.openai.com/v1".into()),
             model: choice.model.clone().unwrap_or_else(|| "whisper-1".into()),
             api_key: crate::api_key(choice)?,
         })
@@ -56,14 +59,24 @@ impl OpenAiStt {
 }
 
 fn engine_err(message: String) -> Error {
-    Error::Engine { engine: "openai-stt".into(), message, fix: Some("Check base URL and API key in Settings → Engines".into()) }
+    Error::Engine {
+        engine: "openai-stt".into(),
+        message,
+        fix: Some("Check base URL and API key in Settings → Engines".into()),
+    }
 }
 
 #[async_trait]
 impl SttEngine for OpenAiStt {
-    fn id(&self) -> &'static str { "openai-stt" }
-    fn display_name(&self) -> String { format!("{} (API)", self.model) }
-    fn is_local(&self) -> bool { false }
+    fn id(&self) -> &'static str {
+        "openai-stt"
+    }
+    fn display_name(&self) -> String {
+        format!("{} (API)", self.model)
+    }
+    fn is_local(&self) -> bool {
+        false
+    }
 
     async fn start_session(
         &self,
@@ -91,10 +104,16 @@ impl SttEngine for OpenAiStt {
                     buf.clear();
                     if !text.trim().is_empty() {
                         let seg = TranscriptSegment {
-                            id: uuid::Uuid::new_v4(), text, lang: lang.clone(),
-                            is_final: true, t_start: t - dur, t_end: t,
+                            id: uuid::Uuid::new_v4(),
+                            text,
+                            lang: lang.clone(),
+                            is_final: true,
+                            t_start: t - dur,
+                            t_end: t,
                         };
-                        if segments_tx.send(seg).await.is_err() { break; }
+                        if segments_tx.send(seg).await.is_err() {
+                            break;
+                        }
                     }
                 }
             }
@@ -102,10 +121,16 @@ impl SttEngine for OpenAiStt {
             if buf.len() as f64 / rate as f64 > 0.5 {
                 let text = this.transcribe_chunk(&buf, rate, &lang).await?;
                 if !text.trim().is_empty() {
-                    let _ = segments_tx.send(TranscriptSegment {
-                        id: uuid::Uuid::new_v4(), text, lang: lang.clone(),
-                        is_final: true, t_start: t, t_end: t,
-                    }).await;
+                    let _ = segments_tx
+                        .send(TranscriptSegment {
+                            id: uuid::Uuid::new_v4(),
+                            text,
+                            lang: lang.clone(),
+                            is_final: true,
+                            t_start: t,
+                            t_end: t,
+                        })
+                        .await;
                 }
             }
             Ok(())

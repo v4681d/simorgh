@@ -35,11 +35,11 @@ tracing-appender = "0.2"
 async-trait = "0.1"
 futures = "0.3"
 bytes = "1"
-reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "rustls-tls", "socks"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "rustls-tls", "socks", "multipart"] }
 tokio-tungstenite = { version = "0.23", features = ["rustls-tls-webpki-roots"] }
 keyring = "3"
 directories = "5"
-uuid = { version = "1", features = ["v4"] }
+uuid = { version = "1", features = ["v4", "serde"] }
 notify = "6"
 sha2 = "0.10"
 

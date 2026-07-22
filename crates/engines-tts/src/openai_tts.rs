@@ -31,7 +31,10 @@ impl OpenAiTts {
         };
         Ok(Self {
             client: crate::http_client(choice)?,
-            base_url: choice.base_url.clone().unwrap_or_else(|| "https://api.openai.com/v1".into()),
+            base_url: choice
+                .base_url
+                .clone()
+                .unwrap_or_else(|| "https://api.openai.com/v1".into()),
             model,
             voice,
             api_key: crate::api_key(choice)?,
@@ -41,11 +44,22 @@ impl OpenAiTts {
 
 #[async_trait]
 impl TtsEngine for OpenAiTts {
-    fn id(&self) -> &'static str { "openai-tts" }
-    fn display_name(&self) -> String { format!("{} / {} (API)", self.model, self.voice) }
-    fn is_local(&self) -> bool { false }
+    fn id(&self) -> &'static str {
+        "openai-tts"
+    }
+    fn display_name(&self) -> String {
+        format!("{} / {} (API)", self.model, self.voice)
+    }
+    fn is_local(&self) -> bool {
+        false
+    }
 
-    async fn synthesize(&self, text: &str, _lang: Lang, audio_tx: mpsc::Sender<AudioFrame>) -> Result<()> {
+    async fn synthesize(
+        &self,
+        text: &str,
+        _lang: Lang,
+        audio_tx: mpsc::Sender<AudioFrame>,
+    ) -> Result<()> {
         let resp = self
             .client
             .post(format!("{}/audio/speech", self.base_url))
@@ -72,7 +86,9 @@ impl TtsEngine for OpenAiTts {
             while pending.len() >= frame_bytes {
                 let take: Vec<u8> = pending.drain(..frame_bytes).collect();
                 let samples = bytes_to_f32(&take);
-                if audio_tx.send(mk_frame(samples)).await.is_err() { return Ok(()); }
+                if audio_tx.send(mk_frame(samples)).await.is_err() {
+                    return Ok(());
+                }
             }
         }
         if pending.len() >= 2 {
@@ -84,13 +100,25 @@ impl TtsEngine for OpenAiTts {
 }
 
 fn bytes_to_f32(bytes: &[u8]) -> Vec<f32> {
-    bytes.chunks_exact(2).map(|b| i16::from_le_bytes([b[0], b[1]]) as f32 / 32768.0).collect()
+    bytes
+        .chunks_exact(2)
+        .map(|b| i16::from_le_bytes([b[0], b[1]]) as f32 / 32768.0)
+        .collect()
 }
 
 fn mk_frame(samples: Vec<f32>) -> AudioFrame {
-    AudioFrame { samples, sample_rate: PCM_RATE, captured_at: Instant::now(), self_generated: true }
+    AudioFrame {
+        samples,
+        sample_rate: PCM_RATE,
+        captured_at: Instant::now(),
+        self_generated: true,
+    }
 }
 
 fn err(message: String) -> Error {
-    Error::Engine { engine: "openai-tts".into(), message, fix: Some("Check base URL and API key in Settings → Engines".into()) }
+    Error::Engine {
+        engine: "openai-tts".into(),
+        message,
+        fix: Some("Check base URL and API key in Settings → Engines".into()),
+    }
 }

@@ -16,7 +16,12 @@ pub struct VadSettings {
 
 impl Default for VadSettings {
     fn default() -> Self {
-        Self { sensitivity: 0.5, min_speech_ms: 200, max_silence_ms: 600, window_ms: 30 }
+        Self {
+            sensitivity: 0.5,
+            min_speech_ms: 200,
+            max_silence_ms: 600,
+            window_ms: 30,
+        }
     }
 }
 
@@ -32,17 +37,27 @@ pub struct EnergyVad {
 
 impl EnergyVad {
     pub fn new(settings: VadSettings) -> Self {
-        Self { settings, noise_floor: 1e-4, in_speech: false, speech_ms: 0, silence_ms: 0 }
+        Self {
+            settings,
+            noise_floor: 1e-4,
+            in_speech: false,
+            speech_ms: 0,
+            silence_ms: 0,
+        }
     }
 
     fn rms(samples: &[f32]) -> f32 {
-        if samples.is_empty() { return 0.0; }
+        if samples.is_empty() {
+            return 0.0;
+        }
         (samples.iter().map(|s| s * s).sum::<f32>() / samples.len() as f32).sqrt()
     }
 }
 
 impl VadEngine for EnergyVad {
-    fn id(&self) -> &'static str { "energy" }
+    fn id(&self) -> &'static str {
+        "energy"
+    }
 
     fn process(&mut self, samples: &[f32]) -> VadEvent {
         let rms = Self::rms(samples);
@@ -62,7 +77,11 @@ impl VadEngine for EnergyVad {
                 self.in_speech = true;
                 return VadEvent::SpeechStart;
             }
-            if self.in_speech { VadEvent::Speech } else { VadEvent::Silence }
+            if self.in_speech {
+                VadEvent::Speech
+            } else {
+                VadEvent::Silence
+            }
         } else {
             self.silence_ms += w;
             self.speech_ms = 0;
@@ -70,7 +89,11 @@ impl VadEngine for EnergyVad {
                 self.in_speech = false;
                 return VadEvent::SpeechEnd;
             }
-            if self.in_speech { VadEvent::Speech } else { VadEvent::Silence }
+            if self.in_speech {
+                VadEvent::Speech
+            } else {
+                VadEvent::Silence
+            }
         }
     }
 
@@ -95,12 +118,18 @@ pub mod silero {
 
     impl SileroVad {
         pub fn new(settings: VadSettings) -> Self {
-            Self { fallback: EnergyVad::new(settings.clone()), settings, session: None }
+            Self {
+                fallback: EnergyVad::new(settings.clone()),
+                settings,
+                session: None,
+            }
         }
     }
 
     impl VadEngine for SileroVad {
-        fn id(&self) -> &'static str { "silero" }
+        fn id(&self) -> &'static str {
+            "silero"
+        }
         fn process(&mut self, samples: &[f32]) -> VadEvent {
             match self.session {
                 Some(_) => unreachable!("session wiring lands with model manager"),
@@ -120,18 +149,28 @@ mod tests {
 
     #[test]
     fn detects_speech_then_end() {
-        let mut vad = EnergyVad::new(VadSettings { min_speech_ms: 60, max_silence_ms: 90, ..Default::default() });
+        let mut vad = EnergyVad::new(VadSettings {
+            min_speech_ms: 60,
+            max_silence_ms: 90,
+            ..Default::default()
+        });
         let silence = vec![0.0005f32; 480];
         let speech: Vec<f32> = (0..480).map(|i| (i as f32 * 0.1).sin() * 0.5).collect();
-        for _ in 0..20 { vad.process(&silence); }
+        for _ in 0..20 {
+            vad.process(&silence);
+        }
         let mut started = false;
         for _ in 0..5 {
-            if vad.process(&speech) == VadEvent::SpeechStart { started = true; }
+            if vad.process(&speech) == VadEvent::SpeechStart {
+                started = true;
+            }
         }
         assert!(started, "should detect speech start");
         let mut ended = false;
         for _ in 0..5 {
-            if vad.process(&silence) == VadEvent::SpeechEnd { ended = true; }
+            if vad.process(&silence) == VadEvent::SpeechEnd {
+                ended = true;
+            }
         }
         assert!(ended, "should detect speech end");
     }

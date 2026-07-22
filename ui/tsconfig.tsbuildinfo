@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/api.ts","./src/i18n.ts","./src/main.tsx","./src/components/index.tsx","./src/screens/Dashboard.tsx","./src/screens/Devices.tsx","./src/screens/Engines.tsx","./src/screens/History.tsx","./src/screens/Models.tsx","./src/screens/Overlay.tsx","./src/screens/Settings.tsx","./src/screens/Wizard.tsx"],"version":"5.9.3"}

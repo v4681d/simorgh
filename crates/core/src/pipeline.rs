@@ -53,10 +53,17 @@ pub struct PipelineDeps {
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum PipelineEvent {
-    State { kind: PipelineKind, state: PipelineState },
+    State {
+        kind: PipelineKind,
+        state: PipelineState,
+    },
     Transcript(TranscriptSegment),
     Translation(TranslationUpdate),
-    Level { kind: PipelineKind, rms: f32, peak: f32 },
+    Level {
+        kind: PipelineKind,
+        rms: f32,
+        peak: f32,
+    },
 }
 
 pub struct PipelineHandle {
@@ -138,7 +145,11 @@ pub async fn start_subtitle_pipeline(
             let Some(seg) = current.clone() else { continue };
             // Cancel a superseded in-flight translation (provisional only).
             if let Some(h) = inflight.take() {
-                if !is_final { h.abort(); } else { let _ = h.await; }
+                if !is_final {
+                    h.abort();
+                } else {
+                    let _ = h.await;
+                }
             }
             let translator = translator.clone();
             let pair = pair.clone();
@@ -167,7 +178,10 @@ pub async fn start_subtitle_pipeline(
 
     let _ = state_tx.send(PipelineState::Running);
     let _ = events_tx
-        .send(PipelineEvent::State { kind: PipelineKind::Subtitle, state: PipelineState::Running })
+        .send(PipelineEvent::State {
+            kind: PipelineKind::Subtitle,
+            state: PipelineState::Running,
+        })
         .await;
     Ok(PipelineHandle {
         kind: PipelineKind::Subtitle,
@@ -185,7 +199,10 @@ pub async fn start_voice_pipeline(
     sink_tx: mpsc::Sender<AudioFrame>,
     events_tx: mpsc::Sender<PipelineEvent>,
 ) -> Result<PipelineHandle> {
-    let tts = deps.tts.clone().ok_or_else(|| Error::Config("voice pipeline requires a TTS engine".into()))?;
+    let tts = deps
+        .tts
+        .clone()
+        .ok_or_else(|| Error::Config("voice pipeline requires a TTS engine".into()))?;
     let (state_tx, _) = watch::channel(PipelineState::Starting);
     let (seg_tx, mut seg_rx) = mpsc::channel::<TranscriptSegment>(CHANNEL_DEPTH);
 
@@ -218,11 +235,19 @@ pub async fn start_voice_pipeline(
                 _ = tick.tick() => deps.policy.on_tick(started.elapsed().as_millis() as u64),
             };
             // Voice is irreversible: only Commit decisions reach TTS.
-            let CommitDecision::Commit(text) = decision else { continue };
+            let CommitDecision::Commit(text) = decision else {
+                continue;
+            };
             let t0 = Instant::now();
             let translated = match translator.translate(&text, &pair).await {
-                Ok(t) => { latency.record(Stage::Translate, t0.elapsed()); t }
-                Err(e) => { warn!(error = %e, "translation failed"); continue }
+                Ok(t) => {
+                    latency.record(Stage::Translate, t0.elapsed());
+                    t
+                }
+                Err(e) => {
+                    warn!(error = %e, "translation failed");
+                    continue;
+                }
             };
             let _ = events
                 .send(PipelineEvent::Translation(TranslationUpdate {
@@ -236,7 +261,10 @@ pub async fn start_voice_pipeline(
             // Synthesize into the virtual mic; close the gate while speaking.
             gate.set_speaking(true);
             let t1 = Instant::now();
-            if let Err(e) = tts.synthesize(&translated, target.clone(), sink_tx.clone()).await {
+            if let Err(e) = tts
+                .synthesize(&translated, target.clone(), sink_tx.clone())
+                .await
+            {
                 warn!(error = %e, "tts failed");
             }
             latency.record(Stage::Tts, t1.elapsed());
@@ -246,7 +274,10 @@ pub async fn start_voice_pipeline(
 
     let _ = state_tx.send(PipelineState::Running);
     let _ = events_tx
-        .send(PipelineEvent::State { kind: PipelineKind::Voice, state: PipelineState::Running })
+        .send(PipelineEvent::State {
+            kind: PipelineKind::Voice,
+            state: PipelineState::Running,
+        })
         .await;
     Ok(PipelineHandle {
         kind: PipelineKind::Voice,

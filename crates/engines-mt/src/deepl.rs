@@ -17,7 +17,10 @@ impl DeepLTranslator {
     pub fn new(choice: &EngineChoice) -> Result<Self> {
         Ok(Self {
             client: crate::http_client(choice)?,
-            base_url: choice.base_url.clone().unwrap_or_else(|| "https://api-free.deepl.com/v2".into()),
+            base_url: choice
+                .base_url
+                .clone()
+                .unwrap_or_else(|| "https://api-free.deepl.com/v2".into()),
             api_key: crate::api_key(choice)?,
         })
     }
@@ -25,9 +28,15 @@ impl DeepLTranslator {
 
 #[async_trait]
 impl Translator for DeepLTranslator {
-    fn id(&self) -> &'static str { "deepl" }
-    fn display_name(&self) -> String { "DeepL (API)".into() }
-    fn is_local(&self) -> bool { false }
+    fn id(&self) -> &'static str {
+        "deepl"
+    }
+    fn display_name(&self) -> String {
+        "DeepL (API)".into()
+    }
+    fn is_local(&self) -> bool {
+        false
+    }
 
     async fn translate(&self, text: &str, pair: &LangPair) -> Result<String> {
         let resp = self
@@ -46,10 +55,17 @@ impl Translator for DeepLTranslator {
             return Err(err(format!("HTTP {}", resp.status())));
         }
         let body: serde_json::Value = resp.json().await.map_err(|e| err(e.to_string()))?;
-        Ok(body["translations"][0]["text"].as_str().unwrap_or_default().to_string())
+        Ok(body["translations"][0]["text"]
+            .as_str()
+            .unwrap_or_default()
+            .to_string())
     }
 }
 
 fn err(message: String) -> Error {
-    Error::Engine { engine: "deepl".into(), message, fix: Some("Check your DeepL API key in Settings → Engines".into()) }
+    Error::Engine {
+        engine: "deepl".into(),
+        message,
+        fix: Some("Check your DeepL API key in Settings → Engines".into()),
+    }
 }

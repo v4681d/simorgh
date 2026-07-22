@@ -6,8 +6,12 @@ use std::time::Instant;
 pub struct Lang(pub String);
 
 impl Lang {
-    pub fn en() -> Self { Lang("en".into()) }
-    pub fn fa() -> Self { Lang("fa".into()) }
+    pub fn en() -> Self {
+        Lang("en".into())
+    }
+    pub fn fa() -> Self {
+        Lang("fa".into())
+    }
     /// Right-to-left script? Used by the UI for direction hints.
     pub fn is_rtl(&self) -> bool {
         matches!(self.0.as_str(), "fa" | "ar" | "he" | "ur" | "ps")

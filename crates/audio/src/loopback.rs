@@ -39,7 +39,10 @@ pub fn start_loopback(device_id: &str, tx: mpsc::Sender<AudioFrame>) -> Result<C
             return Err(Error::Engine {
                 engine: "loopback".into(),
                 message: "No loopback device found on macOS".into(),
-                fix: Some("Install BlackHole and follow Settings → Devices → macOS loopback wizard".into()),
+                fix: Some(
+                    "Install BlackHole and follow Settings → Devices → macOS loopback wizard"
+                        .into(),
+                ),
             });
         }
         return crate::capture::start_capture(device_id, tx);
@@ -47,7 +50,9 @@ pub fn start_loopback(device_id: &str, tx: mpsc::Sender<AudioFrame>) -> Result<C
     #[allow(unreachable_code)]
     {
         let _ = (device_id, tx);
-        Err(Error::Audio("loopback not supported on this platform".into()))
+        Err(Error::Audio(
+            "loopback not supported on this platform".into(),
+        ))
     }
 }
 
@@ -68,7 +73,10 @@ pub fn blackhole_installed() -> bool {
             for d in devices {
                 if let Ok(name) = d.name() {
                     let n = name.to_lowercase();
-                    if n.contains("blackhole") || n.contains("loopback") || n.contains("soundflower") {
+                    if n.contains("blackhole")
+                        || n.contains("loopback")
+                        || n.contains("soundflower")
+                    {
                         return true;
                     }
                 }

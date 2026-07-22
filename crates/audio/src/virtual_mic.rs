@@ -26,7 +26,10 @@ pub enum SetupStatus {
     /// Virtual mic exists and is ready.
     Ready { device: String },
     /// A compatible third-party device was detected (VB-Cable / BlackHole).
-    Detected { device: String, instructions: String },
+    Detected {
+        device: String,
+        instructions: String,
+    },
     /// Nothing found — wizard shows install steps.
     Missing { instructions: String },
 }
@@ -46,11 +49,16 @@ pub async fn ensure_virtual_mic() -> Result<SetupStatus> {
         return Ok(macos_detect());
     }
     #[allow(unreachable_code)]
-    Ok(SetupStatus::Missing { instructions: "Unsupported platform".into() })
+    Ok(SetupStatus::Missing {
+        instructions: "Unsupported platform".into(),
+    })
 }
 
 /// Play synthesized frames into the virtual mic sink until the channel closes.
-pub fn start_sink_writer(device_id: &str, mut rx: mpsc::Receiver<AudioFrame>) -> Result<tokio::task::JoinHandle<()>> {
+pub fn start_sink_writer(
+    device_id: &str,
+    mut rx: mpsc::Receiver<AudioFrame>,
+) -> Result<tokio::task::JoinHandle<()>> {
     let device_id = device_id.to_string();
     Ok(tokio::task::spawn_blocking(move || {
         // Blocking playback via cpal output stream on the sink device.
@@ -72,33 +80,53 @@ mod linux {
     pub async fn ensure() -> Result<SetupStatus> {
         // Already there?
         if sink_exists().await? {
-            return Ok(SetupStatus::Ready { device: SINK_DESCRIPTION.into() });
+            return Ok(SetupStatus::Ready {
+                device: SINK_DESCRIPTION.into(),
+            });
         }
         // Create null sink + remap its monitor as a proper source so chat
         // apps list "Simorgh Microphone" under microphones.
-        run(&["load-module", "module-null-sink",
-              &format!("sink_name={SINK_NAME}"),
-              &format!("sink_properties=device.description={SINK_DESCRIPTION}")]).await?;
-        run(&["load-module", "module-remap-source",
-              &format!("master={SINK_NAME}.monitor"),
-              &format!("source_name={SINK_NAME}_source"),
-              &format!("source_properties=device.description={SINK_DESCRIPTION}")]).await?;
+        run(&[
+            "load-module",
+            "module-null-sink",
+            &format!("sink_name={SINK_NAME}"),
+            &format!("sink_properties=device.description={SINK_DESCRIPTION}"),
+        ])
+        .await?;
+        run(&[
+            "load-module",
+            "module-remap-source",
+            &format!("master={SINK_NAME}.monitor"),
+            &format!("source_name={SINK_NAME}_source"),
+            &format!("source_properties=device.description={SINK_DESCRIPTION}"),
+        ])
+        .await?;
         info!("created PipeWire/PulseAudio virtual microphone");
-        Ok(SetupStatus::Ready { device: SINK_DESCRIPTION.into() })
+        Ok(SetupStatus::Ready {
+            device: SINK_DESCRIPTION.into(),
+        })
     }
 
     async fn sink_exists() -> Result<bool> {
-        let out = Command::new("pactl").args(["list", "short", "sinks"]).output().await
+        let out = Command::new("pactl")
+            .args(["list", "short", "sinks"])
+            .output()
+            .await
             .map_err(|e| Error::Audio(format!("pactl not available: {e}")))?;
         Ok(String::from_utf8_lossy(&out.stdout).contains(SINK_NAME))
     }
 
     async fn run(args: &[&str]) -> Result<()> {
-        let out = Command::new("pactl").args(args).output().await
+        let out = Command::new("pactl")
+            .args(args)
+            .output()
+            .await
             .map_err(|e| Error::Audio(format!("pactl failed: {e}")))?;
         if !out.status.success() {
             return Err(Error::Audio(format!(
-                "pactl {:?}: {}", args, String::from_utf8_lossy(&out.stderr)
+                "pactl {:?}: {}",
+                args,
+                String::from_utf8_lossy(&out.stderr)
             )));
         }
         Ok(())
@@ -114,7 +142,8 @@ fn windows_detect() -> SetupStatus {
         }
     } else {
         SetupStatus::Missing {
-            instructions: "Install VB-Cable (free) from vb-audio.com, then reopen this wizard.".into(),
+            instructions: "Install VB-Cable (free) from vb-audio.com, then reopen this wizard."
+                .into(),
         }
     }
 }
@@ -128,7 +157,8 @@ fn macos_detect() -> SetupStatus {
         }
     } else {
         SetupStatus::Missing {
-            instructions: "Install BlackHole (brew install blackhole-2ch), then reopen this wizard.".into(),
+            instructions:
+                "Install BlackHole (brew install blackhole-2ch), then reopen this wizard.".into(),
         }
     }
 }

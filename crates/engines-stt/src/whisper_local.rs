@@ -35,15 +35,24 @@ impl WhisperLocal {
                 fix: "Open Models and download it (Settings → Models)".into(),
             });
         }
-        Ok(Self { model_path, model_name })
+        Ok(Self {
+            model_path,
+            model_name,
+        })
     }
 }
 
 #[async_trait]
 impl SttEngine for WhisperLocal {
-    fn id(&self) -> &'static str { "whisper-local" }
-    fn display_name(&self) -> String { format!("Whisper {} (local)", self.model_name) }
-    fn is_local(&self) -> bool { true }
+    fn id(&self) -> &'static str {
+        "whisper-local"
+    }
+    fn display_name(&self) -> String {
+        format!("Whisper {} (local)", self.model_name)
+    }
+    fn is_local(&self) -> bool {
+        true
+    }
 
     async fn start_session(
         &self,
@@ -65,7 +74,8 @@ impl SttEngine for WhisperLocal {
 
         let handle = tokio::spawn(async move {
             let mut window: Vec<f32> = Vec::new();
-            let mut ticker = tokio::time::interval(std::time::Duration::from_millis(DECODE_INTERVAL_MS));
+            let mut ticker =
+                tokio::time::interval(std::time::Duration::from_millis(DECODE_INTERVAL_MS));
             let seg_id = uuid::Uuid::new_v4();
             let mut last_text = String::new();
             loop {

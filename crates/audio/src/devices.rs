@@ -34,7 +34,10 @@ pub fn list_devices() -> Result<Vec<DeviceInfo>> {
         let host = cpal::default_host();
         let default_in = host.default_input_device().and_then(|d| d.name().ok());
         let default_out = host.default_output_device().and_then(|d| d.name().ok());
-        for dev in host.input_devices().map_err(|e| simorgh_core::Error::Audio(e.to_string()))? {
+        for dev in host
+            .input_devices()
+            .map_err(|e| simorgh_core::Error::Audio(e.to_string()))?
+        {
             let name = dev.name().unwrap_or_else(|_| "Unknown input".into());
             let rate = dev.default_input_config().ok().map(|c| c.sample_rate().0);
             // PulseAudio/PipeWire expose loopback as `*.monitor` input devices.
@@ -51,7 +54,10 @@ pub fn list_devices() -> Result<Vec<DeviceInfo>> {
                 sample_rate: rate,
             });
         }
-        for dev in host.output_devices().map_err(|e| simorgh_core::Error::Audio(e.to_string()))? {
+        for dev in host
+            .output_devices()
+            .map_err(|e| simorgh_core::Error::Audio(e.to_string()))?
+        {
             let name = dev.name().unwrap_or_else(|_| "Unknown output".into());
             let rate = dev.default_output_config().ok().map(|c| c.sample_rate().0);
             let kind = if crate::virtual_mic::is_simorgh_sink(&name) {

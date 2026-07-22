@@ -52,10 +52,15 @@ pub async fn start_pipeline(
     let (events_tx, mut events_rx) = mpsc::channel::<PipelineEvent>(64);
     let handle = match kind {
         PipelineKind::Subtitle => {
-            let pair = cfg.engines.subtitle_pair.clone().unwrap_or(LangPair { source: Lang::en(), target: Lang::fa() });
+            let pair = cfg.engines.subtitle_pair.clone().unwrap_or(LangPair {
+                source: Lang::en(),
+                target: Lang::fa(),
+            });
             let deps = PipelineDeps {
-                stt: simorgh_engines_stt::create(&cfg.engines.stt_subtitle).map_err(err_to_string)?,
-                translator: simorgh_engines_mt::create(&cfg.engines.translator_subtitle).map_err(err_to_string)?,
+                stt: simorgh_engines_stt::create(&cfg.engines.stt_subtitle)
+                    .map_err(err_to_string)?,
+                translator: simorgh_engines_mt::create(&cfg.engines.translator_subtitle)
+                    .map_err(err_to_string)?,
                 tts: None,
                 policy: Box::new(RetranslationPolicy::new(cfg.policy.clone())),
                 pair,
@@ -64,16 +69,26 @@ pub async fn start_pipeline(
                 settings: cfg.policy.clone(),
             };
             let (audio_tx, audio_rx) = mpsc::channel(64);
-            let device = cfg.devices.loopback_device.clone().ok_or("Select a loopback device first")?;
+            let device = cfg
+                .devices
+                .loopback_device
+                .clone()
+                .ok_or("Select a loopback device first")?;
             let meter = state.subtitle_meter.clone();
             let _guard = start_metered_loopback(&device, audio_tx, meter)?;
-            pipeline::start_subtitle_pipeline(deps, audio_rx, events_tx).await.map_err(err_to_string)?
+            pipeline::start_subtitle_pipeline(deps, audio_rx, events_tx)
+                .await
+                .map_err(err_to_string)?
         }
         PipelineKind::Voice => {
-            let pair = cfg.engines.voice_pair.clone().unwrap_or(LangPair { source: Lang::fa(), target: Lang::en() });
+            let pair = cfg.engines.voice_pair.clone().unwrap_or(LangPair {
+                source: Lang::fa(),
+                target: Lang::en(),
+            });
             let deps = PipelineDeps {
                 stt: simorgh_engines_stt::create(&cfg.engines.stt_voice).map_err(err_to_string)?,
-                translator: simorgh_engines_mt::create(&cfg.engines.translator_voice).map_err(err_to_string)?,
+                translator: simorgh_engines_mt::create(&cfg.engines.translator_voice)
+                    .map_err(err_to_string)?,
                 tts: Some(simorgh_engines_tts::create(&cfg.engines.tts).map_err(err_to_string)?),
                 policy: Box::new(ClauseCommitPolicy::new(cfg.policy.clone())),
                 pair,
@@ -82,13 +97,23 @@ pub async fn start_pipeline(
                 settings: cfg.policy.clone(),
             };
             let (audio_tx, audio_rx) = mpsc::channel(64);
-            let mic = cfg.devices.mic_device.clone().ok_or("Select a microphone first")?;
+            let mic = cfg
+                .devices
+                .mic_device
+                .clone()
+                .ok_or("Select a microphone first")?;
             let meter = state.voice_meter.clone();
             let _guard = start_metered_capture(&mic, audio_tx, meter)?;
             let (sink_tx, sink_rx) = mpsc::channel(64);
-            let sink = cfg.devices.virtual_mic_sink.clone().unwrap_or_else(|| simorgh_audio::virtual_mic::SINK_NAME.into());
+            let sink = cfg
+                .devices
+                .virtual_mic_sink
+                .clone()
+                .unwrap_or_else(|| simorgh_audio::virtual_mic::SINK_NAME.into());
             simorgh_audio::virtual_mic::start_sink_writer(&sink, sink_rx).map_err(err_to_string)?;
-            pipeline::start_voice_pipeline(deps, audio_rx, sink_tx, events_tx).await.map_err(err_to_string)?
+            pipeline::start_voice_pipeline(deps, audio_rx, sink_tx, events_tx)
+                .await
+                .map_err(err_to_string)?
         }
     };
 
@@ -126,7 +151,11 @@ fn stop_pipeline_inner(state: &State<AppState>, kind: PipelineKind) {
 #[tauri::command]
 pub fn pipeline_status(state: State<AppState>) -> CmdResult<serde_json::Value> {
     let get = |slot: &std::sync::Mutex<Option<simorgh_core::pipeline::PipelineHandle>>| {
-        slot.lock().expect("lock").as_ref().map(|h| h.state()).unwrap_or(PipelineState::Stopped)
+        slot.lock()
+            .expect("lock")
+            .as_ref()
+            .map(|h| h.state())
+            .unwrap_or(PipelineState::Stopped)
     };
     Ok(serde_json::json!({
         "subtitle": get(&state.subtitle_pipeline),
@@ -157,7 +186,9 @@ pub fn set_api_key(entry: String, key: String) -> CmdResult<()> {
 
 #[tauri::command]
 pub async fn ensure_virtual_mic() -> CmdResult<SetupStatus> {
-    simorgh_audio::virtual_mic::ensure_virtual_mic().await.map_err(err_to_string)
+    simorgh_audio::virtual_mic::ensure_virtual_mic()
+        .await
+        .map_err(err_to_string)
 }
 
 // ---- Model manager ----
@@ -175,22 +206,39 @@ pub struct ModelInfo {
 pub fn list_models() -> CmdResult<Vec<ModelInfo>> {
     let dir = simorgh_engines_stt::models_dir();
     let catalog: &[(&str, &str)] = &[
-        ("ggml-tiny.bin", "stt"), ("ggml-base.bin", "stt"), ("ggml-small.bin", "stt"),
-        ("ggml-medium.bin", "stt"), ("ggml-large-v3.bin", "stt"),
+        ("ggml-tiny.bin", "stt"),
+        ("ggml-base.bin", "stt"),
+        ("ggml-small.bin", "stt"),
+        ("ggml-medium.bin", "stt"),
+        ("ggml-large-v3.bin", "stt"),
         ("ggml-large-v3-q5_0.bin", "stt"),
-        ("en_US-lessac-medium.onnx", "tts"), ("silero_vad.onnx", "vad"),
+        ("en_US-lessac-medium.onnx", "tts"),
+        ("silero_vad.onnx", "vad"),
     ];
-    Ok(catalog.iter().map(|(name, kind)| {
-        let path = dir.join(name);
-        let size = path.metadata().ok().map(|m| m.len());
-        ModelInfo { name: name.to_string(), kind: kind.to_string(), size_bytes: size, downloaded: path.exists() }
-    }).collect())
+    Ok(catalog
+        .iter()
+        .map(|(name, kind)| {
+            let path = dir.join(name);
+            let size = path.metadata().ok().map(|m| m.len());
+            ModelInfo {
+                name: name.to_string(),
+                kind: kind.to_string(),
+                size_bytes: size,
+                downloaded: path.exists(),
+            }
+        })
+        .collect())
 }
 
 /// Resumable download with checksum verification; progress events streamed to
 /// the UI as `model-download-progress`.
 #[tauri::command]
-pub async fn download_model(app: AppHandle, name: String, url: String, sha256: Option<String>) -> CmdResult<()> {
+pub async fn download_model(
+    app: AppHandle,
+    name: String,
+    url: String,
+    sha256: Option<String>,
+) -> CmdResult<()> {
     use futures::StreamExt;
     use sha2::Digest;
     let dir = simorgh_engines_stt::models_dir();
@@ -201,10 +249,17 @@ pub async fn download_model(app: AppHandle, name: String, url: String, sha256: O
     let existing = tmp.metadata().map(|m| m.len()).unwrap_or(0);
     let client = reqwest::Client::new();
     let mut req = client.get(&url);
-    if existing > 0 { req = req.header("Range", format!("bytes={existing}-")); }
+    if existing > 0 {
+        req = req.header("Range", format!("bytes={existing}-"));
+    }
     let resp = req.send().await.map_err(|e| e.to_string())?;
     let total = existing + resp.content_length().unwrap_or(0);
-    let mut file = tokio::fs::OpenOptions::new().create(true).append(true).open(&tmp).await.map_err(|e| e.to_string())?;
+    let mut file = tokio::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&tmp)
+        .await
+        .map_err(|e| e.to_string())?;
     let mut stream = resp.bytes_stream();
     let mut done = existing;
     use tokio::io::AsyncWriteExt;
@@ -212,9 +267,12 @@ pub async fn download_model(app: AppHandle, name: String, url: String, sha256: O
         let chunk = chunk.map_err(|e| e.to_string())?;
         file.write_all(&chunk).await.map_err(|e| e.to_string())?;
         done += chunk.len() as u64;
-        let _ = app.emit("model-download-progress", serde_json::json!({
-            "name": name, "done": done, "total": total
-        }));
+        let _ = app.emit(
+            "model-download-progress",
+            serde_json::json!({
+                "name": name, "done": done, "total": total
+            }),
+        );
     }
     file.flush().await.map_err(|e| e.to_string())?;
     if let Some(expected) = sha256 {
@@ -225,7 +283,9 @@ pub async fn download_model(app: AppHandle, name: String, url: String, sha256: O
             return Err("Checksum mismatch — download corrupted, please retry".into());
         }
     }
-    tokio::fs::rename(&tmp, &dest).await.map_err(|e| e.to_string())?;
+    tokio::fs::rename(&tmp, &dest)
+        .await
+        .map_err(|e| e.to_string())?;
     Ok(())
 }
 
@@ -242,7 +302,8 @@ pub fn export_history(state: State<AppState>, format: String) -> CmdResult<Strin
     let history = state.history.lock().expect("history lock");
     Ok(match format.as_str() {
         "srt" => to_srt(history.iter()),
-        _ => history.iter()
+        _ => history
+            .iter()
             .map(|h| format!("{}\t{}", h.source_text, h.translated_text))
             .collect::<Vec<_>>()
             .join("\n"),
@@ -256,14 +317,23 @@ fn to_srt<'a>(entries: impl Iterator<Item = &'a HistoryEntry>) -> String {
         let end = e.at_ms + 2_000;
         out.push_str(&format!(
             "{}\n{} --> {}\n{}\n\n",
-            i + 1, srt_time(start), srt_time(end), e.translated_text
+            i + 1,
+            srt_time(start),
+            srt_time(end),
+            e.translated_text
         ));
     }
     out
 }
 
 fn srt_time(ms: u64) -> String {
-    format!("{:02}:{:02}:{:02},{:03}", ms / 3_600_000, (ms / 60_000) % 60, (ms / 1_000) % 60, ms % 1_000)
+    format!(
+        "{:02}:{:02}:{:02},{:03}",
+        ms / 3_600_000,
+        (ms / 60_000) % 60,
+        (ms / 1_000) % 60,
+        ms % 1_000
+    )
 }
 
 // ---- Overlay ----
@@ -289,7 +359,9 @@ fn start_metered_loopback(
     tokio::spawn(async move {
         while let Some(frame) = tap_rx.recv().await {
             meter.feed(&frame.samples);
-            if tx.send(frame).await.is_err() { break; }
+            if tx.send(frame).await.is_err() {
+                break;
+            }
         }
     });
     simorgh_audio::loopback::start_loopback(device, tap_tx).map_err(err_to_string)
@@ -304,7 +376,9 @@ fn start_metered_capture(
     tokio::spawn(async move {
         while let Some(frame) = tap_rx.recv().await {
             meter.feed(&frame.samples);
-            if tx.send(frame).await.is_err() { break; }
+            if tx.send(frame).await.is_err() {
+                break;
+            }
         }
     });
     simorgh_audio::capture::start_capture(device, tap_tx).map_err(err_to_string)

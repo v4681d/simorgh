@@ -16,9 +16,15 @@ pub struct MockStt {
 
 #[async_trait]
 impl SttEngine for MockStt {
-    fn id(&self) -> &'static str { "mock" }
-    fn display_name(&self) -> String { "Mock STT (testing)".into() }
-    fn is_local(&self) -> bool { true }
+    fn id(&self) -> &'static str {
+        "mock"
+    }
+    fn display_name(&self) -> String {
+        "Mock STT (testing)".into()
+    }
+    fn is_local(&self) -> bool {
+        true
+    }
 
     async fn start_session(
         &self,
@@ -27,7 +33,11 @@ impl SttEngine for MockStt {
         segments_tx: mpsc::Sender<TranscriptSegment>,
     ) -> Result<SttSession> {
         let script = if self.script.is_empty() {
-            vec!["hello".into(), "hello world".into(), "hello world again".into()]
+            vec![
+                "hello".into(),
+                "hello world".into(),
+                "hello world again".into(),
+            ]
         } else {
             self.script.clone()
         };
@@ -50,7 +60,9 @@ impl SttEngine for MockStt {
                 if segments_tx.send(seg).await.is_err() {
                     break;
                 }
-                if !is_last { i += 1; }
+                if !is_last {
+                    i += 1;
+                }
             }
             Ok(())
         });

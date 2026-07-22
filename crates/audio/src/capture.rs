@@ -49,7 +49,9 @@ pub fn start_capture(device_id: &str, tx: mpsc::Sender<AudioFrame>) -> Result<Ca
             )
             .map_err(|e| Error::Audio(e.to_string()))?;
         stream.play().map_err(|e| Error::Audio(e.to_string()))?;
-        return Ok(CaptureGuard { _stream: Some(Box::new(stream)) });
+        return Ok(CaptureGuard {
+            _stream: Some(Box::new(stream)),
+        });
     }
     #[cfg(not(feature = "cpal-backend"))]
     {

@@ -20,7 +20,10 @@ pub struct OpenAiCompatTranslator {
 
 impl OpenAiCompatTranslator {
     pub fn new(choice: &EngineChoice) -> Result<Self> {
-        let base_url = choice.base_url.clone().unwrap_or_else(|| "https://api.openai.com/v1".into());
+        let base_url = choice
+            .base_url
+            .clone()
+            .unwrap_or_else(|| "https://api.openai.com/v1".into());
         let is_local = base_url.contains("localhost") || base_url.contains("127.0.0.1");
         Ok(Self {
             client: crate::http_client(choice)?,
@@ -47,26 +50,45 @@ impl OpenAiCompatTranslator {
         if let Some(key) = &self.api_key {
             req = req.bearer_auth(key);
         }
-        let resp = req.send().await.map_err(|e| err(format!("request failed: {e}")))?;
+        let resp = req
+            .send()
+            .await
+            .map_err(|e| err(format!("request failed: {e}")))?;
         if !resp.status().is_success() {
             return Err(err(format!("HTTP {}", resp.status())));
         }
         let body: serde_json::Value = resp.json().await.map_err(|e| err(e.to_string()))?;
-        Ok(body["choices"][0]["message"]["content"].as_str().unwrap_or_default().trim().to_string())
+        Ok(body["choices"][0]["message"]["content"]
+            .as_str()
+            .unwrap_or_default()
+            .trim()
+            .to_string())
     }
 }
 
 fn err(message: String) -> Error {
-    Error::Engine { engine: "openai-compat".into(), message, fix: Some("Check base URL, model, and API key in Settings → Engines".into()) }
+    Error::Engine {
+        engine: "openai-compat".into(),
+        message,
+        fix: Some("Check base URL, model, and API key in Settings → Engines".into()),
+    }
 }
 
 #[async_trait]
 impl Translator for OpenAiCompatTranslator {
-    fn id(&self) -> &'static str { "openai-compat" }
-    fn display_name(&self) -> String {
-        if self.is_local { format!("{} (local server)", self.model) } else { format!("{} (API)", self.model) }
+    fn id(&self) -> &'static str {
+        "openai-compat"
     }
-    fn is_local(&self) -> bool { self.is_local }
+    fn display_name(&self) -> String {
+        if self.is_local {
+            format!("{} (local server)", self.model)
+        } else {
+            format!("{} (API)", self.model)
+        }
+    }
+    fn is_local(&self) -> bool {
+        self.is_local
+    }
 
     async fn translate(&self, text: &str, pair: &LangPair) -> Result<String> {
         let system = format!(

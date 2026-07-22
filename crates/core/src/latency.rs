@@ -39,12 +39,17 @@ impl LatencyRecorder {
         let mut per_stage_ms = HashMap::new();
         let mut total = 0u64;
         for (stage, v) in map.iter() {
-            if v.is_empty() { continue; }
+            if v.is_empty() {
+                continue;
+            }
             let avg = v.iter().map(|d| d.as_millis() as u64).sum::<u64>() / v.len() as u64;
             per_stage_ms.insert(*stage, avg);
             total += avg;
         }
-        LatencyReport { per_stage_ms, end_to_end_ms: total }
+        LatencyReport {
+            per_stage_ms,
+            end_to_end_ms: total,
+        }
     }
 }
 

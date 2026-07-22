@@ -75,7 +75,13 @@ pub struct EngineChoice {
 
 impl Default for EngineChoice {
     fn default() -> Self {
-        Self { engine: "mock".into(), model: None, base_url: None, api_key_ref: None, proxy: None }
+        Self {
+            engine: "mock".into(),
+            model: None,
+            base_url: None,
+            api_key_ref: None,
+            proxy: None,
+        }
     }
 }
 
@@ -103,7 +109,14 @@ pub struct SubtitleConfig {
 
 impl Default for SubtitleConfig {
     fn default() -> Self {
-        Self { font_size: 19, opacity: 0.82, click_through: true, x: None, y: None, width: None }
+        Self {
+            font_size: 19,
+            opacity: 0.82,
+            click_through: true,
+            x: None,
+            y: None,
+            width: None,
+        }
     }
 }
 
@@ -146,10 +159,14 @@ impl AppConfig {
 
     pub fn validate(&self) -> Result<()> {
         if !(0.0..=1.0).contains(&self.subtitle.opacity) {
-            return Err(Error::Config("subtitle.opacity must be within 0..=1".into()));
+            return Err(Error::Config(
+                "subtitle.opacity must be within 0..=1".into(),
+            ));
         }
         if self.policy.silence_end_ms < 100 || self.policy.silence_end_ms > 5_000 {
-            return Err(Error::Config("policy.silence_end_ms must be 100..=5000".into()));
+            return Err(Error::Config(
+                "policy.silence_end_ms must be 100..=5000".into(),
+            ));
         }
         if self.policy.max_chunk_ms < 1_000 {
             return Err(Error::Config("policy.max_chunk_ms must be >= 1000".into()));
@@ -162,9 +179,15 @@ impl AppConfig {
         let mut cfg = self.clone();
         if let Some(name) = &self.active_profile {
             if let Some(p) = self.profiles.get(name) {
-                if let Some(policy) = &p.policy { cfg.policy = policy.clone(); }
-                if let Some(sub) = &p.subtitle { cfg.subtitle = sub.clone(); }
-                if let Some(open_mic) = p.open_mic { cfg.general.open_mic = open_mic; }
+                if let Some(policy) = &p.policy {
+                    cfg.policy = policy.clone();
+                }
+                if let Some(sub) = &p.subtitle {
+                    cfg.subtitle = sub.clone();
+                }
+                if let Some(open_mic) = p.open_mic {
+                    cfg.general.open_mic = open_mic;
+                }
             }
         }
         cfg
@@ -185,7 +208,10 @@ mod tests {
         let mut cfg = AppConfig::default();
         cfg.profiles.insert(
             "meeting".into(),
-            ProfileOverride { open_mic: Some(true), ..Default::default() },
+            ProfileOverride {
+                open_mic: Some(true),
+                ..Default::default()
+            },
         );
         cfg.active_profile = Some("meeting".into());
         assert!(cfg.effective().general.open_mic);

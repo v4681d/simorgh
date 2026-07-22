@@ -73,7 +73,6 @@ function EngineCard({ stage, title, choice, onChange }: {
 }) {
   const { t } = useTranslation()
   const cat = CATALOG[stage]
-  const isLocal = choice.engine === cat.local.engine && !choice.base_url?.includes("http") || choice.engine === cat.local.engine
   const mode = cat.apiEngines.some((a) => a.engine === choice.engine && choice.engine !== cat.local.engine) ? t("engines.api") : t("engines.local")
   const [apiKey, setApiKeyLocal] = useState("")
 
