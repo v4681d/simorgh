@@ -193,8 +193,10 @@ pub fn meter_levels(state: State<AppState>) -> CmdResult<serde_json::Value> {
 /// Store an API key in the OS keychain — never in plaintext config.
 #[tauri::command]
 pub fn set_api_key(entry: String, key: String) -> CmdResult<()> {
+    // Trim — pasted keys with trailing whitespace/newline break Bearer auth.
+    let key = key.trim();
     keyring::Entry::new("simorgh", &entry)
-        .and_then(|e| e.set_password(&key))
+        .and_then(|e| e.set_password(key))
         .map_err(|e| e.to_string())
 }
 

@@ -36,27 +36,38 @@ impl OpenAiCompatTranslator {
     }
 
     async fn chat(&self, system: &str, user: &str) -> Result<String> {
-        let mut req = self
-            .client
-            .post(format!("{}/chat/completions", self.base_url))
-            .json(&json!({
-                "model": self.model,
-                "temperature": 0.2,
-                "messages": [
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user}
-                ]
-            }));
+        let url = format!("{}/chat/completions", self.base_url);
+        tracing::info!(
+            engine = "openai-compat",
+            url = %url,
+            model = %self.model,
+            has_key = self.api_key.is_some(),
+            "chat request"
+        );
+        let mut req = self.client.post(&url).json(&json!({
+            "model": self.model,
+            "temperature": 0.2,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user}
+            ]
+        }));
         if let Some(key) = &self.api_key {
             req = req.bearer_auth(key);
         }
-        let resp = req
-            .send()
-            .await
-            .map_err(|e| err(format!("request failed: {e}")))?;
-        if !resp.status().is_success() {
-            return Err(err(format!("HTTP {}", resp.status())));
+        let resp = req.send().await.map_err(|e| {
+            tracing::warn!(engine = "openai-compat", error = %e, "request failed");
+            err(format!("request failed: {e}"))
+        })?;
+        let status = resp.status();
+        if !status.is_success() {
+            // Surface the provider's error body — it holds the real reason
+            // (bad key, unknown model, quota, etc.).
+            let body = resp.text().await.unwrap_or_default();
+            tracing::warn!(engine = "openai-compat", %status, body = %body, "error response");
+            return Err(err(format!("HTTP {status}: {body}")));
         }
+        tracing::info!(engine = "openai-compat", %status, "chat ok");
         let body: serde_json::Value = resp.json().await.map_err(|e| err(e.to_string()))?;
         Ok(body["choices"][0]["message"]["content"]
             .as_str()

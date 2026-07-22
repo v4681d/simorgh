@@ -146,6 +146,12 @@ function EngineCard({ stage, title, choice, onChange }: {
               onClick={async () => {
                 setTestResult("…")
                 try {
+                  // Persist the typed key before testing — the engine reads
+                  // the keychain, not the input.
+                  if (apiKey) {
+                    await api.setApiKey(choice.api_key_ref ?? choice.engine, apiKey)
+                    setApiKeyLocal("")
+                  }
                   const r = await api.testEngine(stage.replace("_subtitle", ""))
                   setTestResult(r)
                 } catch (e) {
