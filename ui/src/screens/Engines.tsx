@@ -112,7 +112,15 @@ function EngineCard({ stage, title, choice, onChange }: {
           {choice.model && MODEL_BADGES[choice.model] && <Badge>{MODEL_BADGES[choice.model]}</Badge>}
           <Badge tone="positive">{t("engines.offline")}</Badge>
         </div>
-      ) : (
+      ) : null}
+
+      {mode === t("engines.local") && choice.engine === "piper" && (
+        <input placeholder={t("engines.binaryPath") ?? "piper binary path (optional)"} value={choice.binary ?? ""}
+               onChange={(e) => onChange({ ...choice, binary: e.target.value || null })}
+               className="bg-canvas border border-white/20 rounded px-3 py-2" />
+      )}
+
+      {mode !== t("engines.local") ? (
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3">
             <select value={choice.engine} onChange={(e) => onChange({ ...choice, engine: e.target.value })}
@@ -164,7 +172,7 @@ function EngineCard({ stage, title, choice, onChange }: {
             {testResult && <span className="text-[13px] text-secondary">{testResult}</span>}
           </div>
         </div>
-      )}
+      ) : null}
     </section>
   )
 }

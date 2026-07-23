@@ -75,6 +75,9 @@ pub struct EngineChoice {
     pub api_key_ref: Option<String>,
     /// Optional HTTP/SOCKS5 proxy, e.g. "socks5://127.0.0.1:1080".
     pub proxy: Option<String>,
+    /// Optional explicit path to a local binary (e.g. piper.exe). Falls back to
+    /// `PIPER_PATH` env, the dir next to this app exe, then PATH lookup.
+    pub binary: Option<String>,
 }
 
 impl Default for EngineChoice {
@@ -85,6 +88,7 @@ impl Default for EngineChoice {
             base_url: None,
             api_key_ref: None,
             proxy: None,
+            binary: None,
         }
     }
 }

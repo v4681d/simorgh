@@ -36,6 +36,7 @@
     "baseUrl": "Base URL",
     "apiKey": "API key",
     "proxy": "Proxy (HTTP/SOCKS5)",
+    "binaryPath": "piper binary path (optional)",
     "streaming": "streaming",
     "offline": "offline",
     "test": "Test"

@@ -18,6 +18,7 @@ export interface EngineChoice {
   base_url: string | null
   api_key_ref: string | null
   proxy: string | null
+  binary: string | null
 }
 
 export interface AppConfig {

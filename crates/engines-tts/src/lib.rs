@@ -63,3 +63,41 @@ pub fn models_dir() -> std::path::PathBuf {
         .map(|d| d.data_dir().join("models"))
         .unwrap_or_else(|| std::path::PathBuf::from("models"))
 }
+
+/// Resolve a local engine binary. Order: explicit config path → `$env` env var
+/// (if it points at an existing file) → `piper`/`piper.exe` next to this app's
+/// exe → bare `name` (rely on PATH). The bare name is the fallback so the
+/// original PATH-based behavior still works when nothing is configured.
+pub(crate) fn resolve_binary(
+    explicit: Option<&str>,
+    name: &str,
+    env: &str,
+) -> std::path::PathBuf {
+    use std::path::PathBuf;
+    // 1. Explicit path from config — trust the user verbatim.
+    if let Some(p) = explicit.filter(|s| !s.trim().is_empty()) {
+        return PathBuf::from(p);
+    }
+    // 2. Env var pointing at an existing binary.
+    if let Ok(p) = std::env::var(env) {
+        let p = PathBuf::from(p);
+        if p.is_file() {
+            return p;
+        }
+    }
+    // 3. Sibling of the running exe (Windows: drop piper.exe next to the app).
+    if let Ok(exe) = std::env::current_exe() {
+        if let Some(dir) = exe.parent() {
+            let candidate = dir.join(if cfg!(windows) {
+                format!("{name}.exe")
+            } else {
+                name.to_string()
+            });
+            if candidate.is_file() {
+                return candidate;
+            }
+        }
+    }
+    // 4. Fallback: bare name, let the OS resolve via PATH.
+    PathBuf::from(name)
+}

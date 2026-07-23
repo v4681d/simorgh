@@ -36,6 +36,7 @@
     "baseUrl": "آدرس پایه",
     "apiKey": "کلید API",
     "proxy": "پروکسی (HTTP/SOCKS5)",
+    "binaryPath": "مسیر اجرایی piper (اختیاری)",
     "streaming": "جریانی",
     "offline": "آفلاین",
     "test": "آزمایش"

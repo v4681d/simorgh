@@ -20,6 +20,7 @@ const FRAME_SAMPLES: usize = 2_205; // 100 ms
 pub struct PiperTts {
     voice_path: PathBuf,
     voice_name: String,
+    binary: Option<String>,
 }
 
 impl PiperTts {
@@ -38,6 +39,7 @@ impl PiperTts {
         Ok(Self {
             voice_path,
             voice_name,
+            binary: choice.binary.clone(),
         })
     }
 }
@@ -60,7 +62,11 @@ impl TtsEngine for PiperTts {
         _lang: Lang,
         audio_tx: mpsc::Sender<AudioFrame>,
     ) -> Result<()> {
-        let mut child = tokio::process::Command::new("piper")
+        let mut child = tokio::process::Command::new(crate::resolve_binary(
+            self.binary.as_deref(),
+            "piper",
+            "PIPER_PATH",
+        ))
             .arg("--model")
             .arg(&self.voice_path)
             .arg("--output-raw")
