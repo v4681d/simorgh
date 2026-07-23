@@ -8,3 +8,4 @@ crates/app/gen/
 models/
 dist/
 graphify-out/
+CLAUDE.md
