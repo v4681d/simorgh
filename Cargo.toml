@@ -26,8 +26,8 @@ simorgh-engines-tts = { path = "crates/engines-tts", version = "0.1.0" }
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "fs", "process", "io-util"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-toml = "0.8"
-thiserror = "1"
+toml = "1.1"
+thiserror = "2"
 anyhow = "1"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
@@ -36,12 +36,12 @@ async-trait = "0.1"
 futures = "0.3"
 bytes = "1"
 reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "rustls-tls", "socks", "multipart"] }
-tokio-tungstenite = { version = "0.23", features = ["rustls-tls-webpki-roots"] }
-keyring = "3"
-directories = "5"
+tokio-tungstenite = { version = "0.30", features = ["rustls-tls-webpki-roots"] }
+keyring = "4"
+directories = "6"
 uuid = { version = "1", features = ["v4", "serde"] }
-notify = "6"
-sha2 = "0.10"
+notify = "8"
+sha2 = "0.11"
 
 [profile.release]
 lto = "thin"
