@@ -19,9 +19,9 @@ thiserror.workspace = true
 anyhow.workspace = true
 tracing.workspace = true
 async-trait.workspace = true
-cpal = { version = "0.15", optional = true }
+cpal = { version = "0.18", optional = true }
 ort = { version = "2.0.0-rc.4", optional = true, default-features = false }
-ndarray = { version = "0.15", optional = true }
+ndarray = { version = "0.17", optional = true }
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["test-util"] }
